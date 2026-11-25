@@ -1,9 +1,11 @@
 import { useId } from 'react';
-import { Plus, X } from 'lucide-react';
+import { AlertCircle, Plus, X } from 'lucide-react';
 import { DOSAGE_UNITS, MEDICATION_FORMS, type MedicationForm as MedicationFormKind, type ScheduleType } from '../../domain/medication';
 import { describeSchedulePreview, formatDosageUnit } from '../../shared/ptBR/format';
 import { MEDICATION_FORM_LABELS } from '../../shared/ptBR/labels';
 import { buildMedicationDraft, type EndMode, type MedicationFormValues } from '../forms/medicationFormValues';
+import { findEmptyRequiredFields, type RequiredField, type RequiredFieldFlags } from '../forms/missingRequiredFields';
+import { REQUIRED_FIELD_MESSAGES } from '../i18n/messages';
 
 /** Fields the OCR was unsure about (highlighted so the user double-checks them). */
 export interface FieldFlags {
@@ -20,10 +22,16 @@ export function MedicationForm({
   value,
   onChange,
   flags = {},
+  unread = {},
+  isSubmitted = false,
 }: {
   value: MedicationFormValues;
   onChange: (value: MedicationFormValues) => void;
   flags?: FieldFlags;
+  /** Required fields the prescription reading did not return: highlighted until the user fills them in. */
+  unread?: RequiredFieldFlags;
+  /** After a save attempt, every required field that is still empty is highlighted. */
+  isSubmitted?: boolean;
 }) {
   const uniqueId = useId();
   const fieldId = (name: string) => `${uniqueId}-${name}`;
@@ -31,6 +39,20 @@ export function MedicationForm({
   const warn = (isUncertain?: boolean) => (isUncertain ? 'field-warn' : '');
   const hint = (isUncertain?: boolean) =>
     isUncertain ? <p className="mt-1 text-sm font-semibold text-ink">⚠ Leitura incerta. Confira com a receita.</p> : null;
+  // Empty required field that was not read from the prescription (or the user already tried to save). Goes away once filled.
+  const emptyFields = findEmptyRequiredFields(value);
+  const isMissing = (field: RequiredField) => !!emptyFields[field] && (!!unread[field] || isSubmitted);
+  const missingId = (field: RequiredField) => fieldId(`missing-${field}`);
+  const missingProps = (field: RequiredField) => (isMissing(field) ? { 'aria-invalid': true, 'aria-describedby': missingId(field) } : {});
+  const missingHint = (field: RequiredField) =>
+    isMissing(field) ? (
+      <p id={missingId(field)} className="mt-1 flex items-start gap-1.5 text-sm font-semibold text-red-900">
+        <AlertCircle className="mt-0.5 h-4 w-4 shrink-0" aria-hidden="true" />
+        <span>{REQUIRED_FIELD_MESSAGES[field][unread[field] ? 'notRead' : 'empty']}</span>
+      </p>
+    ) : null;
+  const groupStatus = (field: RequiredField, isUncertain?: boolean) =>
+    isMissing(field) ? 'border-red-700 bg-red-50' : isUncertain ? 'border-accent-600 bg-accent-100' : 'border-slate-300';
   const schedulePreview = describeSchedulePreview(buildMedicationDraft(value).draft.schedule);
   const unitOptions = [...new Set([...DOSAGE_UNITS, value.dosageUnit])];
 
@@ -38,9 +60,9 @@ export function MedicationForm({
     <div className="space-y-4">
       <div>
         <label htmlFor={fieldId('name')} className="field-label">Nome do remédio *</label>
-        <input id={fieldId('name')} className={`field ${warn(flags.name)}`} value={value.name} autoComplete="off"
-          onChange={(event) => set({ name: event.target.value })} placeholder="Ex.: Amoxicilina" />
-        {hint(flags.name)}
+        <input id={fieldId('name')} className={`field ${isMissing('name') ? 'field-missing' : warn(flags.name)}`} value={value.name} autoComplete="off"
+          onChange={(event) => set({ name: event.target.value })} placeholder="Ex.: Amoxicilina" {...missingProps('name')} />
+        {isMissing('name') ? missingHint('name') : hint(flags.name)}
       </div>
 
       <div className="grid grid-cols-2 gap-3">
@@ -74,7 +96,7 @@ export function MedicationForm({
           onChange={(event) => set({ instructions: event.target.value })} placeholder="Ex.: após as refeições" />
       </div>
 
-      <fieldset className={`rounded-xl border-2 p-3 ${flags.schedule ? 'border-accent-600 bg-accent-100' : 'border-slate-300'}`}>
+      <fieldset className={`rounded-xl border-2 p-3 ${groupStatus('schedule', flags.schedule)}`}>
         <legend className="px-1 text-base font-semibold">Com que frequência?</legend>
         <div className="grid grid-cols-2 gap-2" role="radiogroup" aria-label="Tipo de frequência">
           {SCHEDULE_OPTIONS.map(([type, label]) => (
@@ -90,14 +112,16 @@ export function MedicationForm({
           <div className="mt-3 grid grid-cols-2 gap-3">
             <div>
               <label htmlFor={fieldId('hours')} className="field-label">A cada quantas horas</label>
-              <input id={fieldId('hours')} type="number" min={1} max={168} inputMode="numeric" className="field"
+              <input id={fieldId('hours')} type="number" min={1} max={168} inputMode="numeric"
+                className={`field ${isMissing('schedule') && !value.intervalHours ? 'field-missing' : ''}`}
                 value={value.intervalHours ?? ''}
-                onChange={(event) => set({ intervalHours: event.target.value ? Number(event.target.value) : undefined })} />
+                onChange={(event) => set({ intervalHours: event.target.value ? Number(event.target.value) : undefined })}
+                {...(!value.intervalHours ? missingProps('schedule') : {})} />
             </div>
             <div>
               <label htmlFor={fieldId('first-dose')} className="field-label">Primeira dose às</label>
-              <input id={fieldId('first-dose')} type="time" className="field" value={value.firstDoseTime}
-                onChange={(event) => set({ firstDoseTime: event.target.value })} />
+              <input id={fieldId('first-dose')} type="time" className={`field ${isMissing('schedule') && !value.firstDoseTime ? 'field-missing' : ''}`}
+                value={value.firstDoseTime} onChange={(event) => set({ firstDoseTime: event.target.value })} />
             </div>
           </div>
         ) : (
@@ -120,7 +144,7 @@ export function MedicationForm({
             </button>
           </div>
         )}
-        {hint(flags.schedule)}
+        {isMissing('schedule') ? missingHint('schedule') : hint(flags.schedule)}
         {schedulePreview && (
           <p className="mt-3 rounded-lg bg-mint p-3 text-base font-semibold text-brand-700" aria-live="polite">
             {schedulePreview}
@@ -128,7 +152,7 @@ export function MedicationForm({
         )}
       </fieldset>
 
-      <fieldset className={`rounded-xl border-2 p-3 ${flags.duration ? 'border-accent-600 bg-accent-100' : 'border-slate-300'}`}>
+      <fieldset className={`rounded-xl border-2 p-3 ${groupStatus('duration', flags.duration)}`}>
         <legend className="px-1 text-base font-semibold">Período do tratamento</legend>
         <div>
           <label htmlFor={fieldId('start')} className="field-label">Começa em</label>
@@ -140,9 +164,8 @@ export function MedicationForm({
           <select id={fieldId('end-mode')} className="field" value={value.endMode}
             onChange={(event) => {
               const endMode = event.target.value as EndMode;
-              if (endMode === 'days') set({ endMode, durationDays: value.durationDays || 7 });
-              else if (endMode === 'date') set({ endMode, endDate: value.endDate || value.startDate });
-              else set({ endMode });
+              // Never invents a period: whatever the user has not given stays empty.
+              set({ endMode });
             }}>
             <option value="days">Por alguns dias</option>
             <option value="date">Até uma data</option>
@@ -152,18 +175,21 @@ export function MedicationForm({
         {value.endMode === 'days' && (
           <div className="mt-3">
             <label htmlFor={fieldId('days')} className="field-label">Quantos dias</label>
-            <input id={fieldId('days')} type="number" min={1} inputMode="numeric" className="field" value={value.durationDays ?? ''}
+            <input id={fieldId('days')} type="number" min={1} inputMode="numeric" placeholder="Ex.: 7"
+              className={`field ${isMissing('duration') ? 'field-missing' : ''}`} value={value.durationDays ?? ''}
+              {...missingProps('duration')}
               onChange={(event) => set({ durationDays: event.target.value ? Number(event.target.value) : undefined })} />
           </div>
         )}
         {value.endMode === 'date' && (
           <div className="mt-3">
             <label htmlFor={fieldId('end')} className="field-label">Último dia</label>
-            <input id={fieldId('end')} type="date" className="field" value={value.endDate} min={value.startDate}
+            <input id={fieldId('end')} type="date" className={`field ${isMissing('duration') ? 'field-missing' : ''}`} value={value.endDate}
+              min={value.startDate} {...missingProps('duration')}
               onChange={(event) => set({ endDate: event.target.value })} />
           </div>
         )}
-        {hint(flags.duration)}
+        {isMissing('duration') ? missingHint('duration') : hint(flags.duration)}
       </fieldset>
 
       <div>

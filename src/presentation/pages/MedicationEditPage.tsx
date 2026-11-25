@@ -63,7 +63,7 @@ export default function MedicationEditPage() {
           <ul className="list-disc pl-5">{issues.map((code) => <li key={code}>{MEDICATION_ISSUE_MESSAGES[code]}</li>)}</ul>
         </div>
       )}
-      <MedicationForm value={values} onChange={setValues} />
+      <MedicationForm value={values} onChange={setValues} isSubmitted={issues.length > 0} />
 
       <div className="mt-6 space-y-3">
         <button type="button" className="btn-primary w-full !min-h-14 text-lg" onClick={save}>
