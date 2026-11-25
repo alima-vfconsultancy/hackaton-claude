@@ -23,7 +23,9 @@ export default function App() {
     document.documentElement.classList.toggle('font-large', settings.fontScale === 'grande');
   }, [settings.fontScale]);
 
-  useEffect(() => window.scrollTo({ top: 0 }), [pathname]);
+  useEffect(() => {
+    window.scrollTo({ top: 0 });
+  }, [pathname]);
 
   const showNav = !['/fotografar', '/revisar'].includes(pathname);
 
