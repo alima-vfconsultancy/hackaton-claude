@@ -1,28 +1,21 @@
-import { useRef, useState } from 'react';
-import { Bell, Database, Download, FlaskConical, Smartphone, Trash2, Type, Upload } from 'lucide-react';
-import { BackupError } from '../../application/errors';
-import { parseBackup, type BackupFile } from '../../application/backup';
+import { useState } from 'react';
+import { Bell, Smartphone, Type } from 'lucide-react';
 import type { NotificationPermissionState } from '../../application/ports';
-import { app, SAMPLE_DATA_ENABLED } from '../../composition-root';
+import { app } from '../../composition-root';
 import type { FontScale } from '../../domain/settings';
-import { ConfirmDialog } from '../components/ConfirmDialog';
 import { PageHeader } from '../components/PageHeader';
 import { useSettings } from '../hooks/useSettings';
-import { BACKUP_ERROR_MESSAGES } from '../i18n/messages';
 
 const FONT_SCALE_OPTIONS: Array<[FontScale, string]> = [['normal', 'Normal'], ['large', 'Grande']];
 const SNOOZE_OPTIONS_MINUTES = [5, 10, 15, 30, 60];
 
 type Feedback = { kind: 'ok' | 'error'; text: string };
 
-/** Notifications, font size, backup/restore, install help, demo data and "erase everything". */
+/** Notifications, font size and install help. */
 export default function SettingsPage() {
   const settings = useSettings();
   const [permission, setPermission] = useState<NotificationPermissionState>(app.notifier.getPermission());
   const [feedback, setFeedback] = useState<Feedback | null>(null);
-  const [pendingRestore, setPendingRestore] = useState<BackupFile | null>(null);
-  const [wipeStep, setWipeStep] = useState<0 | 1 | 2>(0);
-  const fileInput = useRef<HTMLInputElement>(null);
 
   const showSuccess = (text: string) => setFeedback({ kind: 'ok', text });
   const showError = (text: string) => setFeedback({ kind: 'error', text });
@@ -34,25 +27,6 @@ export default function SettingsPage() {
     if (result === 'granted') { await app.settings.save({ notificationsEnabled: true }); showSuccess('Notificações ativadas.'); }
     else if (result === 'unsupported') showError('Este navegador não permite notificações. Use também a opção "Adicionar lembretes ao calendário" em cada remédio.');
     else showError('As notificações foram bloqueadas. Para ativar, abra as configurações do navegador, permita notificações para este app e tente de novo.');
-  }
-
-  async function exportBackup() {
-    const backup = await app.backup.build();
-    app.files.download(
-      new Blob([JSON.stringify(backup, null, 2)], { type: 'application/json' }),
-      `meu-remedio-backup-${backup.exportedAt.slice(0, 10)}.json`,
-    );
-    showSuccess('Backup salvo. Guarde o arquivo em um lugar seguro (por exemplo, no e-mail ou na nuvem).');
-  }
-
-  async function pickBackupFile(file?: File) {
-    if (!file) return;
-    try {
-      setPendingRestore(parseBackup(await file.text()));
-    } catch (caught) {
-      if (caught instanceof BackupError) showError(BACKUP_ERROR_MESSAGES[caught.code]);
-      else throw caught;
-    }
   }
 
   return (
@@ -100,17 +74,6 @@ export default function SettingsPage() {
       </section>
 
       <section className="card mb-4">
-        <h2 className="flex items-center gap-2 text-xl font-bold"><Database className="h-6 w-6" aria-hidden="true" /> Backup dos dados</h2>
-        <p className="mt-1 text-base">Seus dados ficam só neste aparelho. Faça um backup para não perdê-los se trocar de celular.</p>
-        <div className="mt-3 grid gap-2">
-          <button type="button" className="btn-primary" onClick={exportBackup}><Download className="h-5 w-5" aria-hidden="true" /> Exportar backup (JSON)</button>
-          <button type="button" className="btn-secondary" onClick={() => fileInput.current?.click()}><Upload className="h-5 w-5" aria-hidden="true" /> Importar backup</button>
-          <input ref={fileInput} type="file" accept="application/json,.json" className="sr-only" aria-label="Escolher arquivo de backup"
-            onChange={(event) => { void pickBackupFile(event.target.files?.[0]); event.target.value = ''; }} />
-        </div>
-      </section>
-
-      <section className="card mb-4">
         <h2 className="flex items-center gap-2 text-xl font-bold"><Smartphone className="h-6 w-6" aria-hidden="true" /> Instalar na tela inicial</h2>
         <details className="mt-2">
           <summary className="min-h-12 cursor-pointer py-2 text-base font-bold">Android (Chrome)</summary>
@@ -130,33 +93,6 @@ export default function SettingsPage() {
           </ol>
         </details>
       </section>
-
-      {SAMPLE_DATA_ENABLED && (
-        <section className="card mb-4">
-          <h2 className="flex items-center gap-2 text-xl font-bold"><FlaskConical className="h-6 w-6" aria-hidden="true" /> Demonstração</h2>
-          <button type="button" className="btn-secondary mt-3 w-full" onClick={async () => { await app.sampleData.load(); showSuccess('Exemplo carregado. Veja na tela Hoje.'); }}>
-            Carregar exemplo
-          </button>
-        </section>
-      )}
-
-      <section className="card mb-4 border-red-300">
-        <h2 className="flex items-center gap-2 text-xl font-bold"><Trash2 className="h-6 w-6" aria-hidden="true" /> Apagar tudo</h2>
-        <p className="mt-1 text-base">Remove todos os remédios, doses e configurações deste aparelho. Não dá para desfazer.</p>
-        <button type="button" className="btn-danger mt-3 w-full" onClick={() => setWipeStep(1)}>Apagar todos os dados</button>
-      </section>
-
-      <ConfirmDialog open={!!pendingRestore} danger title="Importar este backup?"
-        message={`Isto vai SUBSTITUIR todos os dados atuais por ${pendingRestore?.medications.length ?? 0} remédio(s) do arquivo.`}
-        confirmLabel="Sim, importar" onCancel={() => setPendingRestore(null)}
-        onConfirm={async () => { await app.backup.restore(pendingRestore!); setPendingRestore(null); showSuccess('Backup importado com sucesso.'); }} />
-      <ConfirmDialog open={wipeStep === 1} danger title="Apagar todos os dados?"
-        message="Todos os remédios e o histórico de doses serão apagados deste aparelho."
-        confirmLabel="Continuar" onCancel={() => setWipeStep(0)} onConfirm={() => setWipeStep(2)} />
-      <ConfirmDialog open={wipeStep === 2} danger title="Tem certeza absoluta?"
-        message="Esta é a última confirmação. Depois de apagar, só um arquivo de backup pode recuperar seus dados."
-        confirmLabel="Apagar tudo agora" onCancel={() => setWipeStep(0)}
-        onConfirm={async () => { await app.backup.wipeAll(); setWipeStep(0); showSuccess('Todos os dados foram apagados.'); }} />
     </div>
   );
 }
