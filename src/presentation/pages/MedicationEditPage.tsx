@@ -28,7 +28,7 @@ export default function MedicationEditPage() {
     void app.medications.get(id).then((found) => {
       if (found) {
         setMedication(found);
-        setValues(medicationToFormValues(found));
+        setValues(medicationToFormValues(found, 'date'));
       }
       setIsLoading(false);
     });

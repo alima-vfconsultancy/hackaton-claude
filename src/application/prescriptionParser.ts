@@ -71,7 +71,9 @@ function quantityUnit(raw: string): DosageUnit {
 /** Reads "0,5", "500" or number words ("meio", "duas") as a number; `null` when it is not one. */
 function parseAmount(raw: string): number | null {
   const fromWord = NUMBER_WORDS[raw];
-  const value = fromWord !== undefined ? fromWord : parseFloat(raw.replace(',', '.'));
+  // "1.000" is one thousand in pt-BR, not 1.0.
+  const text = /^\d{1,3}(\.\d{3})+$/.test(raw) ? raw.replace(/\./g, '') : raw.replace(',', '.');
+  const value = fromWord !== undefined ? fromWord : parseFloat(text);
   return Number.isFinite(value) ? value : null;
 }
 

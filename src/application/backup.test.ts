@@ -48,6 +48,9 @@ describe('parseBackup', () => {
     expect(codeOf(JSON.stringify({ ...valid, medications: [{ id: 1 }] }))).toBe('invalid_data');
     expect(codeOf(JSON.stringify({ ...valid, medications: [{ id: 'a', name: 'X', period: {}, schedule: {} }] }))).toBe('invalid_data');
     expect(codeOf(JSON.stringify({ ...valid, doseLogs: [{ id: 'd' }] }))).toBe('invalid_data');
+    expect(codeOf(JSON.stringify({ ...valid, settings: { snoozeMinutes: 'abc' } }))).toBe('invalid_data');
+    expect(codeOf(JSON.stringify({ ...valid, medications: [{ ...buildMedication(), dosesTrackedFrom: undefined }] }))).toBe('invalid_data');
+    expect(codeOf(JSON.stringify({ ...valid, medications: [{ ...buildMedication(), period: { startDate: '2026-03-10', endDate: 5 } }] }))).toBe('invalid_data');
   });
 });
 

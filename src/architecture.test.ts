@@ -51,6 +51,7 @@ function listFiles(directory: string): string[] {
 }
 
 function layerOf(path: string): Layer {
+  if (['App', 'App.tsx', 'main', 'main.tsx'].includes(path)) return 'presentation';
   const [first] = path.split(sep);
   return (['domain', 'shared', 'application', 'infrastructure', 'presentation'] as const).find((layer) => layer === first) ?? 'bootstrap';
 }
@@ -89,7 +90,7 @@ describe('architecture: dependency rule', () => {
     for (const file of sources) {
       for (const specifier of importsOf(file.code)) {
         const target = targetLayer(file, specifier);
-        if (!target) continue;
+        if (!target || /\.css$/.test(specifier)) continue;
         const isCompositionRoot = target.path === 'composition-root';
         if (file.layer === 'presentation' && isCompositionRoot) continue;
         if (!ALLOWED_LAYERS[file.layer].includes(target.layer)) {

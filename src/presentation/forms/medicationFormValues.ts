@@ -45,8 +45,15 @@ const DEFAULT_INTERVAL_HOURS = 8;
 const DEFAULT_FIRST_DOSE_TIME = '08:00';
 const DEFAULT_FIXED_TIMES = ['08:00', '20:00'];
 
-/** Turns a draft (new or stored) into form state. A bounded treatment is shown as "N days". */
-export function medicationToFormValues(draft: MedicationDraft): MedicationFormValues {
+/**
+ * Turns a draft (new or stored) into form state.
+ * @param boundedMode - how a bounded treatment is shown: "N days" for new drafts; stored medications use `'date'`
+ *   so that editing the start date does not silently move the chosen last day
+ */
+export function medicationToFormValues(
+  draft: MedicationDraft,
+  boundedMode: Exclude<EndMode, 'continuous'> = 'days',
+): MedicationFormValues {
   const { schedule, period } = draft;
   const durationDays = period.endDate
     ? Math.max(1, differenceInCalendarDays(parseLocalDate(period.endDate), parseLocalDate(period.startDate)) + 1)
@@ -63,7 +70,7 @@ export function medicationToFormValues(draft: MedicationDraft): MedicationFormVa
     firstDoseTime: schedule.type === 'interval' ? schedule.firstDoseTime : schedule.times[0] ?? DEFAULT_FIRST_DOSE_TIME,
     times: schedule.type === 'fixedTimes' ? schedule.times : DEFAULT_FIXED_TIMES,
     startDate: period.startDate,
-    endMode: period.endDate ? 'days' : 'continuous',
+    endMode: period.endDate ? boundedMode : 'continuous',
     durationDays,
     endDate: period.endDate ?? '',
     prescriber: draft.prescriber,

@@ -33,6 +33,11 @@ describe('medicationToFormValues', () => {
     expect(medicationToFormValues(draft)).toMatchObject({ endMode: 'days', durationDays: 7, endDate: '2026-03-16' });
   });
 
+  it('can show a stored bounded treatment by its last day', () => {
+    const draft = { ...buildMedicationDraft(valid()).draft, period: { startDate: '2026-03-10', endDate: '2026-03-16' } };
+    expect(medicationToFormValues(draft, 'date')).toMatchObject({ endMode: 'date', endDate: '2026-03-16' });
+  });
+
   it('keeps defaults for the schedule type that is not in use', () => {
     const draft = { ...buildMedicationDraft(valid()).draft, schedule: { type: 'fixedTimes' as const, times: ['07:00'] } };
     expect(medicationToFormValues(draft)).toMatchObject({ scheduleType: 'fixedTimes', times: ['07:00'], intervalHours: 8, firstDoseTime: '07:00' });

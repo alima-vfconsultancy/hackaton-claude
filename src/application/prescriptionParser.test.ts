@@ -111,6 +111,10 @@ describe('parsePrescription: single prescription lines', () => {
     expect(s.instructions).toContain('5 ml por vez');
   });
 
+  it('19. reads a thousands separator as part of the number', () => {
+    expect(first('Dipirona 1.000mg 6/6h').dosage).toEqual({ amount: 1000, unit: 'mg' });
+  });
+
   it('18. does not read different numbers in "X/Y h" as an interval', () => {
     expect(first('Remédio Teste 10mg 3/8h').confidence.schedule).toBe('low');
   });

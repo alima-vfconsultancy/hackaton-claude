@@ -22,17 +22,28 @@ export interface BackupFile {
 
 const isObject = (value: unknown): value is Record<string, unknown> => typeof value === 'object' && value !== null;
 
+const MEDICATION_STATUSES = ['active', 'paused', 'finished'];
+const DOSE_STATUSES = ['pending', 'taken', 'skipped', 'missed', 'snoozed'];
+
 function isMedicationShape(value: unknown): boolean {
   if (!isObject(value) || typeof value.id !== 'string' || typeof value.name !== 'string') return false;
+  if (!MEDICATION_STATUSES.includes(value.status as string) || typeof value.form !== 'string') return false;
+  if (typeof value.dosesTrackedFrom !== 'number') return false;
   const { period, schedule } = value;
   if (!isObject(period) || typeof period.startDate !== 'string') return false;
+  if (period.endDate !== undefined && typeof period.endDate !== 'string') return false;
   if (!isObject(schedule)) return false;
   if (schedule.type === 'interval') return typeof schedule.intervalHours === 'number';
   return schedule.type === 'fixedTimes' && Array.isArray(schedule.times);
 }
 
 const isDoseShape = (value: unknown): boolean =>
-  isObject(value) && typeof value.id === 'string' && typeof value.medicationId === 'string' && typeof value.scheduledAt === 'number';
+  isObject(value) && typeof value.id === 'string' && typeof value.medicationId === 'string' && typeof value.scheduledAt === 'number'
+  && DOSE_STATUSES.includes(value.status as string);
+
+const isSettingsShape = (value: unknown): boolean =>
+  isObject(value) && typeof value.notificationsEnabled === 'boolean' && typeof value.snoozeMinutes === 'number'
+  && (value.fontScale === 'normal' || value.fontScale === 'large');
 
 /**
  * Validates the content of a backup file.
@@ -50,6 +61,7 @@ export function parseBackup(text: string): BackupFile {
   if (data.version !== BACKUP_VERSION) throw new BackupError('unsupported_version');
   if (!Array.isArray(data.medications) || !Array.isArray(data.doseLogs)) throw new BackupError('incomplete');
   if (!data.medications.every(isMedicationShape) || !data.doseLogs.every(isDoseShape)) throw new BackupError('invalid_data');
+  if (data.settings != null && !isSettingsShape(data.settings)) throw new BackupError('invalid_data');
 
   return {
     app: BACKUP_APP_ID,
@@ -58,7 +70,7 @@ export function parseBackup(text: string): BackupFile {
     medications: data.medications as Medication[],
     doseLogs: data.doseLogs as DoseLog[],
     photos: Array.isArray(data.photos) ? (data.photos as PrescriptionPhoto[]) : [],
-    settings: isObject(data.settings) ? (data.settings as unknown as Settings) : null,
+    settings: data.settings ? (data.settings as Settings) : null,
   };
 }
 

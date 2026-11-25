@@ -21,6 +21,7 @@ export interface InMemoryStore {
   settings?: Settings;
 }
 
+/** Storage ports backed by arrays; `store` exposes the raw state for assertions. */
 export function createInMemoryPorts(initial: Partial<InMemoryStore> = {}): StoragePorts & { store: InMemoryStore } {
   const store: InMemoryStore = { medications: [], doses: [], photos: [], ...initial };
   let counter = 0;
@@ -100,6 +101,7 @@ export interface RecordingNotifier extends ReminderNotifier {
   alerts: number;
 }
 
+/** Notifier that records what it was asked to show instead of showing it. */
 export function createRecordingNotifier(): RecordingNotifier {
   const notifier: RecordingNotifier = {
     shown: [],
@@ -138,6 +140,7 @@ export function buildMedication(overrides: Partial<Medication> = {}): Medication
   };
 }
 
+/** A valid dose for tests; override any field. */
 export function buildDose(overrides: Partial<DoseLog> = {}): DoseLog {
   return { id: 'dose-1', medicationId: 'med-1', scheduledAt: 0, status: 'pending', ...overrides };
 }

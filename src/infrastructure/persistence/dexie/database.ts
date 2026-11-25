@@ -11,6 +11,7 @@ export const SETTINGS_KEY = 'app';
 
 const TABLE_NAMES = ['medications', 'doseLogs', 'settings', 'photos'] as const;
 
+/** IndexedDB schema of the app (see the version history below). */
 export class AppDatabase extends Dexie {
   medications!: Table<Medication, string>;
   doseLogs!: Table<DoseLog, string>;

@@ -112,6 +112,7 @@ separadamente e é tão vinculante quanto este arquivo:
   `sourceOcrText?`, `photoId?`, `dosesTrackedFrom`. `Settings.fontScale` é `normal|large`.
 - **Datas**: `startDate`/`endDate` são strings `yyyy-MM-dd` (`LocalDate`, data local); `scheduledAt`, `takenAt`,
   `createdAt`, `updatedAt` são timestamps em ms (`EpochMs`). Horários são `HH:mm` (`LocalTime`) em hora local.
+- **Hora padrão da 1ª dose**: a partir das 23h o formulário novo sugere 08:00 (antes caía em 00:00 por um bug de comparação).
 - **Duração**: `durationDays` existe só no formulário (`presentation/forms`); ao salvar, o app calcula
   `endDate = startDate + durationDays - 1`. `endDate` é inclusivo (doses até 23:59 desse dia).
 - **Doses materializadas**: `syncDoses` (application) cria registros `DoseLog` (status `pending`) do
