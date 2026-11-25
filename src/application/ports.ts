@@ -73,12 +73,16 @@ export interface OcrJob {
 
 /** Reads text from a prescription photo, entirely on the device. */
 export interface OcrEngine {
-  recognize(image: Blob, onProgress: (progress: OcrProgress) => void): OcrJob;
+  /**
+   * @param images - variants of the same photo (same size and position), best first;
+   *   the engine may skip the others when the first one reads well
+   */
+  recognize(images: Blob[], onProgress: (progress: OcrProgress) => void): OcrJob;
 }
 
 export interface PreparedImage {
-  /** Grayscale, contrast-stretched image sent to the OCR. */
-  ocrBlob: Blob;
+  /** Cleaned-up variants of the photo sent to the OCR (straightened, shadows removed), best first. */
+  ocrBlobs: Blob[];
   /** Smaller color photo shown during the review. */
   previewDataUrl: string;
 }
