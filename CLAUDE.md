@@ -138,6 +138,12 @@ separadamente e é tão vinculante quanto este arquivo:
   as mensagens em português ficam em `presentation/i18n/messages.ts`.
 - **Tesseract offline**: worker e core (wasm) servidos da própria origem (`public/tesseract`, precacheados);
   dados do idioma baixados do jsDelivr na primeira leitura e cacheados (Workbox CacheFirst + IndexedDB do Tesseract).
+- **Pipeline do OCR**: `infrastructure/imaging/filters` (funções puras) faz escala para ~2400 px (amplia até 2x
+  imagens pequenas), mediana 3×3, correção de iluminação (divide pelo fundo estimado), contraste, deskew por perfil
+  de projeção e gera 2 variantes: cinza realçada e binarizada (Sauvola). O `tesseractOcrEngine` lê as variantes com
+  um único worker (`user_defined_dpi=300`), pula a 2ª se a 1ª tiver confiança ≥ 85 e funde as linhas pela sobreposição
+  das caixas, ficando com a mais confiável (`mergeOcrLines`). `application/ocrTextCleanup` corrige `5OO`→`500`,
+  `rng`→`mg`, `cornprimido`→`comprimido` antes do parser (nunca mexe no nome do remédio).
 - **Fotos**: tabela `photos` separada; `Medication.photoId` aponta para a miniatura (uma receita pode ter vários remédios).
 - **Configurações** ficam no Dexie (tabela `settings`, linha de chave `app`, detalhe só do adaptador). `localStorage` não é usado.
 - **Dados de exemplo**: botão "Carregar exemplo" em Configurações quando `SAMPLE_DATA_ENABLED`
