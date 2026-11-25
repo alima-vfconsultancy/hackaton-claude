@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { startOfDay } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
-import { DayButton, DayPicker, getDefaultClassNames, type DayButtonProps } from 'react-day-picker';
+import { DayButton, DayPicker, type DayButtonProps } from 'react-day-picker';
 import 'react-day-picker/style.css';
 import { app } from '../../composition-root';
 import { dayAgendaEntryTime, type DayAgendaEntry } from '../../domain/dayAgenda';
@@ -11,15 +11,31 @@ import { DoseStatusBadge } from '../components/DoseStatusBadge';
 import { PageHeader } from '../components/PageHeader';
 import { useLiveData } from '../hooks/useLiveData';
 
-/** Day button that adds a small dot under the number when the `hasDoses` modifier matches. */
+/**
+ * Day button: the dot is absolutely positioned so it never changes the button's box size
+ * (a sibling flex item would otherwise push the number sideways and shift the grid).
+ * Today/selected are mutually exclusive branches so their colors never have to be merged.
+ */
 function DayButtonWithDoseDot(props: DayButtonProps) {
-  const { day, modifiers, ...buttonProps } = props;
+  const { day, modifiers, className, ...buttonProps } = props;
+  const stateClassName = modifiers.selected
+    ? 'bg-brand-700 text-white'
+    : modifiers.today
+      ? 'font-bold text-brand-800 ring-2 ring-inset ring-brand-700'
+      : '';
   return (
-    <DayButton {...buttonProps} day={day} modifiers={modifiers}>
-      {day.date.getDate()}
-      {modifiers.hasDoses && (
-        <span className="mx-auto mt-0.5 block h-1.5 w-1.5 rounded-full bg-brand-700" aria-hidden="true" />
-      )}
+    <DayButton {...buttonProps} day={day} modifiers={modifiers} className={`${className ?? ''} ${stateClassName}`}>
+      <span className="relative flex h-full w-full items-center justify-center">
+        {day.date.getDate()}
+        {modifiers.hasDoses && (
+          <span
+            aria-hidden="true"
+            className={`absolute bottom-0.5 left-1/2 h-1.5 w-1.5 -translate-x-1/2 rounded-full ${
+              modifiers.selected ? 'bg-white' : 'bg-brand-700'
+            }`}
+          />
+        )}
+      </span>
     </DayButton>
   );
 }
@@ -33,8 +49,6 @@ export default function CalendarPage() {
   const monthEnd = startOfDay(new Date(month.getFullYear(), month.getMonth() + 1, 0));
   const datesWithDoses = useLiveData(() => app.agenda.getDatesWithDoses(monthStart, monthEnd), [monthStart.getTime()]);
   const dayAgenda = useLiveData(() => app.agenda.getDayAgenda(selectedDate), [selectedDate.getTime()]);
-
-  const defaultClassNames = getDefaultClassNames();
 
   return (
     <div>
@@ -52,10 +66,6 @@ export default function CalendarPage() {
           onSelect={(date) => setSelectedDate(startOfDay(date))}
           modifiers={{ hasDoses: (date) => datesWithDoses?.has(formatLocalDate(date)) ?? false }}
           components={{ DayButton: DayButtonWithDoseDot }}
-          classNames={{
-            today: `${defaultClassNames.today} font-bold text-brand-800`,
-            selected: `${defaultClassNames.selected} bg-brand-700 text-white rounded-xl`,
-          }}
         />
       </div>
 
