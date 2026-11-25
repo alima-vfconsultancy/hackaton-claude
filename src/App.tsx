@@ -1,18 +1,21 @@
 import { useEffect } from 'react';
 import { Route, Routes, useLocation } from 'react-router-dom';
-import { BottomNav } from './components/BottomNav';
-import { DueBanner } from './components/DueBanner';
-import { useSettings } from './hooks/useSettings';
-import { useReminders } from './hooks/useReminders';
-import TodayPage from './pages/TodayPage';
-import MedicationEditPage from './pages/MedicationEditPage';
-import CapturePage from './pages/CapturePage';
-import ReviewPage from './pages/ReviewPage';
-import HistoryPage from './pages/HistoryPage';
-import MedicationDetailPage from './pages/MedicationDetailPage';
-import ExportPage from './pages/ExportPage';
-import SettingsPage from './pages/SettingsPage';
-import { PageHeader } from './components/PageHeader';
+import { BottomNav } from './presentation/components/BottomNav';
+import { DueBanner } from './presentation/components/DueBanner';
+import { PageHeader } from './presentation/components/PageHeader';
+import { useReminders } from './presentation/hooks/useReminders';
+import { useSettings } from './presentation/hooks/useSettings';
+import CapturePage from './presentation/pages/CapturePage';
+import ExportPage from './presentation/pages/ExportPage';
+import HistoryPage from './presentation/pages/HistoryPage';
+import MedicationDetailPage from './presentation/pages/MedicationDetailPage';
+import MedicationEditPage from './presentation/pages/MedicationEditPage';
+import ReviewPage from './presentation/pages/ReviewPage';
+import SettingsPage from './presentation/pages/SettingsPage';
+import TodayPage from './presentation/pages/TodayPage';
+
+// Route paths are part of the user-facing URL, so they stay in Portuguese.
+const FULL_SCREEN_ROUTES = ['/fotografar', '/revisar'];
 
 export default function App() {
   const settings = useSettings();
@@ -20,18 +23,20 @@ export default function App() {
   const due = useReminders(settings.notificationsEnabled);
 
   useEffect(() => {
-    document.documentElement.classList.toggle('font-large', settings.fontScale === 'grande');
+    document.documentElement.classList.toggle('font-large', settings.fontScale === 'large');
   }, [settings.fontScale]);
 
-  useEffect(() => window.scrollTo({ top: 0 }), [pathname]);
+  useEffect(() => {
+    window.scrollTo({ top: 0 });
+  }, [pathname]);
 
-  const showNav = !['/fotografar', '/revisar'].includes(pathname);
+  const showNav = !FULL_SCREEN_ROUTES.includes(pathname);
 
   return (
     <div className={`mx-auto min-h-screen max-w-md px-4 pt-4 ${pathname === '/' ? 'pb-64' : 'pb-24'}`}>
-      <a href="#conteudo" className="sr-only focus:not-sr-only focus:absolute focus:z-30 focus:bg-white focus:p-2">Ir para o conteúdo</a>
+      <a href="#content" className="sr-only focus:not-sr-only focus:absolute focus:z-30 focus:bg-white focus:p-2">Ir para o conteúdo</a>
       <DueBanner due={due} />
-      <main id="conteudo">
+      <main id="content">
         <Routes>
           <Route path="/" element={<TodayPage />} />
           <Route path="/fotografar" element={<CapturePage />} />
