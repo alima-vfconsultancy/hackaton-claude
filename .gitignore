@@ -1,0 +1,11 @@
+node_modules
+dist
+dev-dist
+*.local
+.env
+.env.*
+public/tesseract
+coverage
+.DS_Store
+.claude/
+.pr2-body.tmp.md
