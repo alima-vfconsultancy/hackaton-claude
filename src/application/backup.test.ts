@@ -60,7 +60,8 @@ describe('BackupService', () => {
       medications: [buildMedication()],
       doses: [buildDose()],
       photos: [{ id: 'p1', dataUrl: 'x', createdAt: 0 }],
-      settings: { notificationsEnabled: true, snoozeMinutes: 15, fontScale: 'large' },
+      allergies: [{ id: 'a1', substance: 'Dipirona', notes: '', createdAt: 0 }],
+      settings: { notificationsEnabled: true, snoozeMinutes: 15, fontScale: 'large', allergyAiConsent: false },
     });
     const backup = parseBackup(JSON.stringify(await createBackupService(source).build()));
 
@@ -70,7 +71,17 @@ describe('BackupService', () => {
     expect(target.store.medications.map((m) => m.id)).toEqual(['med-1']);
     expect(target.store.doses).toHaveLength(1);
     expect(target.store.photos).toHaveLength(1);
-    expect(target.store.settings).toEqual({ notificationsEnabled: true, snoozeMinutes: 15, fontScale: 'large' });
+    expect(target.store.allergies.map((a) => a.substance)).toEqual(['Dipirona']);
+    expect(target.store.settings).toEqual({ notificationsEnabled: true, snoozeMinutes: 15, fontScale: 'large', allergyAiConsent: false });
+  });
+
+  it('treats a missing AI consent in an older backup as not granted', () => {
+    const text = JSON.stringify({
+      app: 'meu-remedio', version: 2, medications: [], doseLogs: [],
+      settings: { notificationsEnabled: true, snoozeMinutes: 15, fontScale: 'large' },
+    });
+
+    expect(parseBackup(text).settings?.allergyAiConsent).toBe(false);
   });
 
   it('wipes every table', async () => {
@@ -78,11 +89,11 @@ describe('BackupService', () => {
       medications: [buildMedication()],
       doses: [buildDose()],
       photos: [{ id: 'p1', dataUrl: 'x', createdAt: 0 }],
-      settings: { notificationsEnabled: true, snoozeMinutes: 15, fontScale: 'large' },
+      settings: { notificationsEnabled: true, snoozeMinutes: 15, fontScale: 'large', allergyAiConsent: false },
     });
 
     await createBackupService(ports).wipeAll();
 
-    expect(ports.store).toEqual({ medications: [], doses: [], photos: [], settings: undefined });
+    expect(ports.store).toEqual({ medications: [], doses: [], photos: [], allergies: [], settings: undefined });
   });
 });

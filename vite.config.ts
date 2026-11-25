@@ -2,9 +2,11 @@
 import { defineConfig } from 'vite';
 import react from '@vitejs/plugin-react';
 import { VitePWA } from 'vite-plugin-pwa';
+import { devApiPlugin } from './scripts/devApiPlugin';
 
-export default defineConfig({
+export default defineConfig(({ mode }) => ({
   plugins: [
+    devApiPlugin(mode),
     react(),
     VitePWA({
       registerType: 'autoUpdate',
@@ -47,5 +49,5 @@ export default defineConfig({
       devOptions: { enabled: false },
     }),
   ],
-  test: { environment: 'node', include: ['src/**/*.test.ts'] },
-});
+  test: { environment: 'node', include: ['src/**/*.test.ts', 'api/**/*.test.ts'] },
+}));

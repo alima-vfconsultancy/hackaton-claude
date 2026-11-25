@@ -5,6 +5,7 @@ import { parseBackup, type BackupFile } from '../../application/backup';
 import type { NotificationPermissionState } from '../../application/ports';
 import { app, SAMPLE_DATA_ENABLED } from '../../composition-root';
 import type { FontScale } from '../../domain/settings';
+import { AllergySection } from '../components/AllergySection';
 import { ConfirmDialog } from '../components/ConfirmDialog';
 import { PageHeader } from '../components/PageHeader';
 import { useSettings } from '../hooks/useSettings';
@@ -86,6 +87,8 @@ export default function SettingsPage() {
           </select>
         </div>
       </section>
+
+      <AllergySection />
 
       <section className="card mb-4">
         <h2 className="flex items-center gap-2 text-xl font-bold"><Type className="h-6 w-6" aria-hidden="true" /> Tamanho da letra</h2>

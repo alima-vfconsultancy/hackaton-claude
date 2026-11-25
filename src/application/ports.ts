@@ -1,3 +1,5 @@
+import type { Allergy } from '../domain/allergy';
+import type { AllergyAnalysisItem, AllergyAnalysisRequest } from '../domain/allergyAnalysis';
 import type { DoseLog } from '../domain/dose';
 import type { Medication } from '../domain/medication';
 import type { PrescriptionPhoto } from '../domain/photo';
@@ -46,6 +48,14 @@ export interface PhotoRepository {
   findById(id: string): Promise<PrescriptionPhoto | undefined>;
   add(photo: PrescriptionPhoto): Promise<void>;
   addMany(photos: PrescriptionPhoto[]): Promise<void>;
+  remove(id: string): Promise<void>;
+  clear(): Promise<void>;
+}
+
+export interface AllergyRepository {
+  listAll(): Promise<Allergy[]>;
+  add(allergy: Allergy): Promise<void>;
+  addMany(allergies: Allergy[]): Promise<void>;
   remove(id: string): Promise<void>;
   clear(): Promise<void>;
 }
@@ -128,6 +138,11 @@ export interface ReminderNotifier {
   playAlert(): void;
 }
 
+/** Asks an external service which active ingredients a medication has and whether they match the allergies. Rejects on any failure. */
+export interface AllergyAnalyzer {
+  analyze(request: AllergyAnalysisRequest): Promise<AllergyAnalysisItem[]>;
+}
+
 export interface FileDownloader {
   download(blob: Blob, fileName: string): void;
 }
@@ -139,6 +154,7 @@ export interface StoragePorts {
   doses: DoseRepository;
   settings: SettingsRepository;
   photos: PhotoRepository;
+  allergies: AllergyRepository;
 }
 
 export interface DevicePorts {
@@ -148,6 +164,8 @@ export interface DevicePorts {
   calendar: CalendarExporter;
   notifier: ReminderNotifier;
   files: FileDownloader;
+  /** `null` when no analysis service is configured: the app then only uses the local check. */
+  allergyAnalyzer: AllergyAnalyzer | null;
 }
 
 export type ApplicationPorts = StoragePorts & DevicePorts;
