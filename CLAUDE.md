@@ -1,6 +1,6 @@
 # MeuRemédio — guia do projeto
 
-PWA mobile-first, em português do Brasil, para organizar medicamentos: fotografar a
+PWA mobile-first para organizar medicamentos: fotografar a
 receita → OCR local → revisão pelo usuário → agenda de doses com lembretes →
 histórico → PDF. Público: adultos e idosos. Simplicidade e legibilidade vêm antes
 de qualquer recurso extra.
@@ -98,12 +98,8 @@ separadamente e é tão vinculante quanto este arquivo:
   template obrigatório antes de iniciar qualquer tarefa.
 - [`docs/adr/`](./docs/adr/) — decisões arquiteturais registradas.
 - [`CONTRIBUTING.md`](./CONTRIBUTING.md) — branches, Conventional Commits,
-  Pull Requests, versionamento/release automático.
-
-Regras de branch/commit/PR/merge (nunca push direto em `main`, nunca colar
-contexto de chat em commits/PRs, branch sempre atualizada e sem conflitos
-antes da PR) estão em `CONTRIBUTING.md` e `docs/development-process.md` —
-nenhum agente pode contorná-las.
+  Pull Requests, versionamento/release automático (fonte das regras de
+  merge/PR; nenhum agente pode contorná-las).
 
 ## Decisões técnicas registradas
 - **Datas**: `startDate`/`endDate` são strings `yyyy-MM-dd` (data local); `scheduledAt`, `takenAt`,

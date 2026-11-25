@@ -1,8 +1,8 @@
 # MeuRemédio
 
-PWA mobile-first, 100% em português do Brasil, que ajuda uma pessoa a organizar
-seus medicamentos: fotografar a receita → OCR local → revisão do usuário →
-agenda de doses com lembretes → histórico → exportação em PDF.
+PWA mobile-first que ajuda uma pessoa a organizar seus medicamentos:
+fotografar a receita → OCR local → revisão do usuário → agenda de doses com
+lembretes → histórico → exportação em PDF.
 
 Público principal: adultos e idosos, muitas vezes com pouca familiaridade com
 tecnologia. Simplicidade e legibilidade vêm antes de qualquer recurso extra.
@@ -60,12 +60,10 @@ nesta ordem:
 
 - **Código, nomes de arquivos, classes, funções, variáveis, comentários,
   commits, nomes de branch e títulos de PR: sempre em inglês.**
-- **Interface exibida ao usuário final: sempre em português do Brasil**, já que
-  o público é brasileiro.
+- **Interface exibida ao usuário final: sempre em português do Brasil.**
 - Documentação de processo (este README, `CONTRIBUTING.md`, `docs/`, descrições
   de PR/issue): em português, para a equipe.
 
 ## Licença / aviso
 
-Projeto interno, sem garantias. Consulte sempre um profissional de saúde —
-o app é apenas um organizador.
+Projeto interno, sem garantias.

@@ -6,12 +6,10 @@ Aceito
 
 ## Contexto
 
-Todo o código deste projeto é escrito por agentes de IA (Claude Code ou
-equivalente), operados por 5 desenvolvedores diferentes. Sem um processo
-explícito, cada agente define seu próprio nível de rigor, não há garantia de
-que o código corresponde ao que foi pedido (em vez do que o agente
-"entendeu" de uma conversa informal), e não há segunda opinião antes do
-merge.
+Sem um processo explícito, cada agente de IA define seu próprio nível de
+rigor, não há garantia de que o código corresponde ao que foi pedido (em vez
+do que o agente "entendeu" de uma conversa informal), e não há segunda
+opinião antes do merge.
 
 ## Decisão
 

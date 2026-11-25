@@ -6,12 +6,12 @@ Aceito
 
 ## Contexto
 
-Com 5 desenvolvedores/agentes commitando em paralelo, precisamos de uma
-forma objetiva de saber o que mudou entre versões e de gerar o número de
-versão de forma consistente e rastreável, sem depender de alguém lembrar de
-atualizar `package.json` manualmente. Não há, por ora, necessidade de
-publicar em um registry nem de pipeline de deploy — a necessidade é apenas
-versionamento (tag) e changelog automáticos a partir do histórico de commits.
+Precisamos de uma forma objetiva de saber o que mudou entre versões e de
+gerar o número de versão de forma consistente e rastreável, sem depender de
+alguém lembrar de atualizar `package.json` manualmente. Não há, por ora,
+necessidade de publicar em um registry nem de pipeline de deploy — a
+necessidade é apenas versionamento (tag) e changelog automáticos a partir do
+histórico de commits.
 
 ## Decisão
 

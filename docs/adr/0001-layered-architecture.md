@@ -8,10 +8,9 @@ Aceito
 
 O MeuRemédio é um PWA client-only (sem backend). O código inicial organiza
 tudo por "tipo técnico" (`components/`, `pages/`, `lib/`, `db/`), sem uma
-regra explícita de dependência entre essas pastas. Com 5 desenvolvedores
-trabalhando em paralelo via agentes de IA, falta de regra de dependência leva
-a lógica de negócio vazando para componentes React, e componentes React
-importando Dexie/Tesseract/jsPDF diretamente — dificultando teste e revisão.
+regra explícita de dependência entre essas pastas. Sem essa regra, a lógica
+de negócio vaza para componentes React, e componentes React importam
+Dexie/Tesseract/jsPDF diretamente — dificultando teste e revisão.
 
 DDD "completo" (bounded contexts, agregados, event sourcing) é
 desproporcional para um app client-only de um único domínio pequeno.

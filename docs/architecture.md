@@ -6,8 +6,8 @@ O MeuRemédio é um PWA client-only: sem backend, sem API própria, toda a
 persistência é local (IndexedDB via Dexie). Não existe hoje uma camada de
 servidor, então frameworks pesados de DDD orientados a sistemas distribuídos
 (agregados, bounded contexts múltiplos, event sourcing) seriam exagero. Ao
-mesmo tempo, "jogar tudo em `components/`" não escala para 5 desenvolvedores
-trabalhando em paralelo via agentes de IA.
+mesmo tempo, "jogar tudo em `components/`" não escala para múltiplos
+desenvolvedores trabalhando em paralelo.
 
 Decisão (ver [`docs/adr/0001-layered-architecture.md`](./adr/0001-layered-architecture.md)):
 adotar uma **arquitetura em camadas pragmática, inspirada em Clean
