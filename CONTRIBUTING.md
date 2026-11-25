@@ -2,14 +2,14 @@
 
 Este guia vale tanto para humanos quanto para agentes de IA (Claude Code e
 similares) trabalhando neste repositório. Leia também `CLAUDE.md` (contexto
-de produto/regras de segurança), `docs/arquitetura.md` (camadas) e
-`docs/processo-de-desenvolvimento.md` (fluxo completo com plano aprovado,
+de produto/regras de segurança), `docs/architecture.md` (camadas) e
+`docs/development-process.md` (fluxo completo com plano aprovado,
 TDD e revisor independente).
 
 ## Antes de codar
 
 Nenhum código é escrito sem um Plano de Entrega aprovado
-(`docs/templates/plano-de-entrega.md`). Ver `docs/processo-de-desenvolvimento.md`.
+(`docs/templates/delivery-plan.md`). Ver `docs/development-process.md`.
 
 ## Branches
 
@@ -97,7 +97,7 @@ commit final em `main`.
   fora entenderia sem ter visto o chat (o que foi feito, por quê, como
   testar) — nunca "conforme conversamos" ou prompts colados.
 - A PR só é aberta depois que o agente revisor independente aprovou o
-  trabalho (ver `docs/processo-de-desenvolvimento.md`).
+  trabalho (ver `docs/development-process.md`).
 - CI (`.github/workflows/ci.yml`) precisa estar verde: typecheck, testes e
   build.
 - Merge é sempre manual, feito por um humano, depois de revisão humana.

@@ -21,7 +21,7 @@ desproporcional para um app client-only de um único domínio pequeno.
 Adotar 4 camadas conceituais com regra de dependência em uma única direção:
 `presentation → application → domain`, com `infrastructure` implementando
 adaptadores usados pela camada `application`. Ver detalhamento em
-[`docs/arquitetura.md`](../arquitetura.md).
+[`docs/architecture.md`](../architecture.md).
 
 Mapeamento para as pastas já existentes (sem necessidade de migração
 imediata): `domain` ≈ `src/types.ts`; `application` ≈ `src/lib/` (lógica
@@ -39,6 +39,6 @@ Dexie/Tesseract/jsPDF/Notification API; `presentation` ≈ `src/components/`,
   subjetivo de "está organizado".
 - Custo: exige disciplina para não importar bibliotecas externas direto em
   componentes — isso é verificado na revisão independente (ver
-  `docs/processo-de-desenvolvimento.md`).
+  `docs/development-process.md`).
 - Se o projeto ganhar backend/sincronização, esta decisão deve ser revisitada
   em um novo ADR.

@@ -1,7 +1,8 @@
 # ADR-0000: Template
 
-Copie este arquivo para `NNNN-titulo-curto-em-portugues.md` (próximo número
-sequencial) ao registrar uma nova decisão.
+Copie este arquivo para `NNNN-short-title-in-english.md` (próximo número
+sequencial, nome do arquivo em inglês) ao registrar uma nova decisão. O
+conteúdo do ADR é em português, como os demais documentos de processo.
 
 ## Status
 

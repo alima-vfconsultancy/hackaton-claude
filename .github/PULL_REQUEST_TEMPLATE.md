@@ -5,10 +5,11 @@
 
 ## Plano de Entrega relacionado
 
-<!-- Link/caminho para o docs/templates/plano-de-entrega.md preenchido e aprovado,
-     ou para a issue que contém o plano aprovado. -->
+<!-- Link para a issue/comentário que contém o Plano de Entrega preenchido
+     (a partir do template docs/templates/delivery-plan.md) e a aprovação
+     do humano responsável. -->
 
-Plano: `docs/entregas/...` (ou link da issue)
+Plano: <link da issue ou comentário com o plano aprovado>
 
 ## O que mudou
 
@@ -28,7 +29,7 @@ Plano: `docs/entregas/...` (ou link da issue)
 - [ ] Branch atualizada com `main`, sem conflitos
 - [ ] `npm run build` e `npm test` passam localmente
 - [ ] Testes novos cobrem o comportamento descrito no Plano de Entrega (TDD)
-- [ ] Regra de dependência entre camadas respeitada (`docs/arquitetura.md`)
+- [ ] Regra de dependência entre camadas respeitada (`docs/architecture.md`)
 - [ ] Sem segredos, chaves ou dados sensíveis no diff
 - [ ] Descrição não contém trechos colados de conversa com o agente de IA
 - [ ] Revisor independente (agente) aprovou antes da abertura desta PR

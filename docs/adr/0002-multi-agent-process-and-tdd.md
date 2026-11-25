@@ -15,7 +15,7 @@ merge.
 
 ## Decisão
 
-1. Nenhuma tarefa começa sem um Plano de Entrega (`docs/templates/plano-de-entrega.md`)
+1. Nenhuma tarefa começa sem um Plano de Entrega (`docs/templates/delivery-plan.md`)
    aprovado explicitamente por um humano. Esse plano — não o histórico de
    chat — é a especificação contra a qual o trabalho é validado depois.
 2. Implementação segue TDD estrito (skill `test-driven-development`):
@@ -29,7 +29,7 @@ merge.
    sempre uma ação humana.
 
 Detalhamento completo em
-[`docs/processo-de-desenvolvimento.md`](../processo-de-desenvolvimento.md).
+[`docs/development-process.md`](../development-process.md).
 
 ## Consequências
 

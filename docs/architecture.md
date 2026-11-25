@@ -9,7 +9,7 @@ servidor, então frameworks pesados de DDD orientados a sistemas distribuídos
 mesmo tempo, "jogar tudo em `components/`" não escala para 5 desenvolvedores
 trabalhando em paralelo via agentes de IA.
 
-Decisão (ver [`docs/adr/0001-arquitetura-em-camadas.md`](./adr/0001-arquitetura-em-camadas.md)):
+Decisão (ver [`docs/adr/0001-layered-architecture.md`](./adr/0001-layered-architecture.md)):
 adotar uma **arquitetura em camadas pragmática, inspirada em Clean
 Architecture / DDD-lite**, com regra de dependência em uma única direção.
 
@@ -63,7 +63,7 @@ presentation  →  application  →  domain
    importa de `src/components`).
 
 Violação dessa regra é motivo de reprovação no revisor independente (ver
-[`docs/processo-de-desenvolvimento.md`](./processo-de-desenvolvimento.md)).
+[`docs/development-process.md`](./development-process.md)).
 
 ## Nota sobre a estrutura atual
 

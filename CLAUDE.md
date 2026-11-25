@@ -43,8 +43,10 @@ src/
     ics.ts                 # gera arquivo .ics (RRULE + VALARM)
     pdf.ts                 # gera PDF A4 (jsPDF + autotable)
     backup.ts              # exportar/importar JSON + validação
+    adherence.ts            # cálculo de taxa de adesão (doses tomadas / previstas)
     notifications.ts       # permissão e disparo via service worker
     format.ts              # formatação pt-BR (datas, frequência, dose)
+    download.ts             # helper de download de arquivo (PDF, .ics, JSON)
     sampleData.ts          # dados de exemplo (modo dev)
   components/              # UI reutilizável (DoseCard, MedicationForm, BottomNav...)
   pages/                   # uma por tela
@@ -85,22 +87,23 @@ agentes de IA. O processo completo (plano aprovado → TDD → revisor
 independente → PR → merge humano → release automático) está documentado
 separadamente e é tão vinculante quanto este arquivo:
 
-- [`docs/arquitetura.md`](./docs/arquitetura.md) — camadas (domain/application/
+- [`docs/architecture.md`](./docs/architecture.md) — camadas (domain/application/
   infrastructure/presentation) e regra de dependência entre pastas.
-- [`docs/processo-de-desenvolvimento.md`](./docs/processo-de-desenvolvimento.md) —
+- [`docs/development-process.md`](./docs/development-process.md) —
   papéis (coordenador/executor/revisor independente), TDD obrigatório, gate
   de aprovação humana antes de qualquer código.
-- [`docs/padroes-de-codigo.md`](./docs/padroes-de-codigo.md) — nomenclatura e
+- [`docs/coding-standards.md`](./docs/coding-standards.md) — nomenclatura e
   **idioma: código sempre em inglês, interface sempre em português**.
-- [`docs/templates/plano-de-entrega.md`](./docs/templates/plano-de-entrega.md) —
+- [`docs/templates/delivery-plan.md`](./docs/templates/delivery-plan.md) —
   template obrigatório antes de iniciar qualquer tarefa.
 - [`docs/adr/`](./docs/adr/) — decisões arquiteturais registradas.
 - [`CONTRIBUTING.md`](./CONTRIBUTING.md) — branches, Conventional Commits,
   Pull Requests, versionamento/release automático.
 
-Regras que nenhum agente pode contornar: nunca fazer merge/push direto em
-`main`; nunca colar trechos de conversa do chat na descrição de commits/PRs;
-sempre abrir PR a partir de uma branch atualizada com `main` e sem conflitos.
+Regras de branch/commit/PR/merge (nunca push direto em `main`, nunca colar
+contexto de chat em commits/PRs, branch sempre atualizada e sem conflitos
+antes da PR) estão em `CONTRIBUTING.md` e `docs/development-process.md` —
+nenhum agente pode contorná-las.
 
 ## Decisões técnicas registradas
 - **Datas**: `startDate`/`endDate` são strings `yyyy-MM-dd` (data local); `scheduledAt`, `takenAt`,
@@ -133,4 +136,4 @@ sempre abrir PR a partir de uma branch atualizada com `main` e sem conflitos.
 - **Navegação inferior**: o 4º item se chama "Ajustes" (rota `/configuracoes`) porque "Configurações" não cabe em 360px.
 - **Rotas**: `/`, `/fotografar`, `/revisar`, `/medicamento/novo`, `/medicamento/:id/editar`, `/historico`, `/historico/:id`, `/exportar`, `/configuracoes`.
 - **Code splitting**: jsPDF e Tesseract são carregados sob demanda (`import()`).
-- **Versões**: Vite 6, Tailwind 3, React Router 6, TypeScript 5.9 (majors estáveis) em vez dos mais novos.
+- **Versões**: majors estáveis — Vite 6, Tailwind 3, React Router 6, TypeScript 5.9.

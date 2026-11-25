@@ -5,6 +5,10 @@
 > de o agente coordenador/executor começar o trabalho. É este documento —
 > não o histórico de chat — que o agente revisor independente usa como
 > especificação para validar a entrega.
+>
+> Cole o conteúdo preenchido na issue (ou em um comentário da issue)
+> correspondente à tarefa; a PR só referencia o link, sem commitar um
+> arquivo de plano por tarefa em `docs/`.
 
 ## Objetivo
 
@@ -29,7 +33,7 @@
 
 ## Camadas/arquivos afetados
 
-<!-- Ver docs/arquitetura.md. Ajuda o revisor a checar se a regra de dependência foi respeitada. -->
+<!-- Ver docs/architecture.md. Ajuda o revisor a checar se a regra de dependência foi respeitada. -->
 
 - Domain: ...
 - Application (`src/lib`): ...

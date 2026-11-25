@@ -18,4 +18,4 @@ labels: enhancement
 -
 
 > Ao ser aprovada, esta issue pode virar (ou referenciar) um
-> `docs/templates/plano-de-entrega.md` preenchido antes da implementação.
+> `docs/templates/delivery-plan.md` preenchido antes da implementação.

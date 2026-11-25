@@ -47,12 +47,12 @@ nesta ordem:
    segurança e decisões técnicas. É a fonte primária lida pelos agentes de IA.
 2. [`CONTRIBUTING.md`](./CONTRIBUTING.md) — fluxo de branches, commits, Pull
    Requests e releases.
-3. [`docs/arquitetura.md`](./docs/arquitetura.md) — padrão arquitetural adotado
+3. [`docs/architecture.md`](./docs/architecture.md) — padrão arquitetural adotado
    (camadas) e regras de dependência entre pastas.
-4. [`docs/processo-de-desenvolvimento.md`](./docs/processo-de-desenvolvimento.md) —
+4. [`docs/development-process.md`](./docs/development-process.md) —
    como um agente (coordenador, executor e revisor independente) deve planejar,
    implementar com TDD e validar o trabalho antes de abrir uma PR.
-5. [`docs/padroes-de-codigo.md`](./docs/padroes-de-codigo.md) — nomenclatura,
+5. [`docs/coding-standards.md`](./docs/coding-standards.md) — nomenclatura,
    idioma do código (inglês) vs. idioma da interface (português), docstrings.
 6. [`docs/adr/`](./docs/adr/) — registro das decisões arquiteturais (ADRs).
 
@@ -67,5 +67,5 @@ nesta ordem:
 
 ## Licença / aviso
 
-Projeto interno de hackathon. Sem garantias. Consulte sempre um profissional de
-saúde — o app é apenas um organizador.
+Projeto interno, sem garantias. Consulte sempre um profissional de saúde —
+o app é apenas um organizador.

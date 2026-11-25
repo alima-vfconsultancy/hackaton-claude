@@ -29,9 +29,9 @@ caos, todo trabalho segue o fluxo abaixo. Nenhuma etapa é opcional.
 ### 1. Planejar (gate humano obrigatório)
 
 Antes de qualquer linha de código, preencha
-[`docs/templates/plano-de-entrega.md`](./templates/plano-de-entrega.md) com:
+[`docs/templates/delivery-plan.md`](./templates/delivery-plan.md) com:
 objetivo, escopo dentro/fora, critérios de aceite verificáveis, arquivos/
-camadas afetadas (ver `docs/arquitetura.md`), plano de testes e riscos.
+camadas afetadas (ver `docs/architecture.md`), plano de testes e riscos.
 
 O plano é aprovado explicitamente pelo humano responsável (nome + data no
 próprio documento, ou aprovação registrada na issue/PR). **Nenhum agente
@@ -79,11 +79,11 @@ Ele verifica, objetivamente:
 
 - O que foi implementado corresponde ao escopo e aos critérios de aceite do
   plano (nem menos, nem "bônus" fora de escopo).
-- Regras de dependência entre camadas foram respeitadas (`docs/arquitetura.md`).
+- Regras de dependência entre camadas foram respeitadas (`docs/architecture.md`).
 - TDD foi seguido (existem testes para o comportamento novo; eles passam).
 - Sem segredos, sem vazamento de contexto de chat na descrição da PR
-  (ver `CONTRIBUTING.md`).
-- Nomenclatura e idioma seguem `docs/padroes-de-codigo.md`.
+  (regra completa em `CONTRIBUTING.md`).
+- Nomenclatura e idioma seguem `docs/coding-standards.md`.
 
 Veredito registrado como comentário na PR. Reprovado → volta para o passo 3
 com a lista objetiva de problemas (máximo de 2 ciclos de correção automática
@@ -92,9 +92,9 @@ antes de escalar para o humano, conforme `requesting-code-review`).
 ### 6. Pull Request
 
 Só depois do veredito de aprovação o agente abre a PR (ou atualiza a PR já
-aberta), usando o template de `.github/PULL_REQUEST_TEMPLATE.md`, com título
-em inglês no padrão Conventional Commits e descrição em português apontando
-para o Plano de Entrega — nunca colando trechos de conversa com o agente.
+aberta), usando o template de `.github/PULL_REQUEST_TEMPLATE.md` (formato de
+título/descrição e regra de não colar conversa: ver `CONTRIBUTING.md` →
+"Pull Requests").
 
 A branch precisa estar **sem conflitos e atualizada com `main`** antes de
 abrir a PR (ver `CONTRIBUTING.md` → "Branches").

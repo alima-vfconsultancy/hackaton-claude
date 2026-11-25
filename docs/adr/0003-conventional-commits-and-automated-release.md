@@ -7,11 +7,10 @@ Aceito
 ## Contexto
 
 Com 5 desenvolvedores/agentes commitando em paralelo, precisamos de uma
-forma objetiva de saber o que mudou entre versões e de gerar número de
-versão de forma consistente (ex.: identificar "a última versão estável foi a
-2.0", depois um fix vira "2.0.1"), sem depender de alguém lembrar de
+forma objetiva de saber o que mudou entre versões e de gerar o número de
+versão de forma consistente e rastreável, sem depender de alguém lembrar de
 atualizar `package.json` manualmente. Não há, por ora, necessidade de
-publicar em um registry nem de pipeline de deploy — o pedido é apenas
+publicar em um registry nem de pipeline de deploy — a necessidade é apenas
 versionamento (tag) e changelog automáticos a partir do histórico de commits.
 
 ## Decisão

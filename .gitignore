@@ -8,3 +8,4 @@ public/tesseract
 coverage
 .DS_Store
 .claude/
+.pr2-body.tmp.md
