@@ -1,6 +1,6 @@
 # MeuRemédio — guia do projeto
 
-PWA mobile-first, em português do Brasil, para organizar medicamentos: fotografar a
+PWA mobile-first para organizar medicamentos: fotografar a
 receita → OCR local → revisão pelo usuário → agenda de doses com lembretes →
 histórico → PDF. Público: adultos e idosos. Simplicidade e legibilidade vêm antes
 de qualquer recurso extra.
@@ -43,8 +43,10 @@ src/
     ics.ts                 # gera arquivo .ics (RRULE + VALARM)
     pdf.ts                 # gera PDF A4 (jsPDF + autotable)
     backup.ts              # exportar/importar JSON + validação
+    adherence.ts            # cálculo de taxa de adesão (doses tomadas / previstas)
     notifications.ts       # permissão e disparo via service worker
     format.ts              # formatação pt-BR (datas, frequência, dose)
+    download.ts             # helper de download de arquivo (PDF, .ics, JSON)
     sampleData.ts          # dados de exemplo (modo dev)
   components/              # UI reutilizável (DoseCard, MedicationForm, BottomNav...)
   pages/                   # uma por tela
@@ -78,6 +80,27 @@ Testes ficam ao lado do código: `src/lib/*.test.ts`.
 - Linguagem simples; mensagens de erro dizem o que fazer. Sem animações desnecessárias.
 - Navegação inferior com 4 itens: Hoje, Histórico, Exportar, Configurações.
 
+## Processo, arquitetura e governança
+
+Este projeto é construído por 5 desenvolvedores que usam exclusivamente
+agentes de IA. O processo completo (plano aprovado → TDD → revisor
+independente → PR → merge humano → release automático) está documentado
+separadamente e é tão vinculante quanto este arquivo:
+
+- [`docs/architecture.md`](./docs/architecture.md) — camadas (domain/application/
+  infrastructure/presentation) e regra de dependência entre pastas.
+- [`docs/development-process.md`](./docs/development-process.md) —
+  papéis (coordenador/executor/revisor independente), TDD obrigatório, gate
+  de aprovação humana antes de qualquer código.
+- [`docs/coding-standards.md`](./docs/coding-standards.md) — nomenclatura e
+  **idioma: código sempre em inglês, interface sempre em português**.
+- [`docs/templates/delivery-plan.md`](./docs/templates/delivery-plan.md) —
+  template obrigatório antes de iniciar qualquer tarefa.
+- [`docs/adr/`](./docs/adr/) — decisões arquiteturais registradas.
+- [`CONTRIBUTING.md`](./CONTRIBUTING.md) — branches, Conventional Commits,
+  Pull Requests, versionamento/release automático (fonte das regras de
+  merge/PR; nenhum agente pode contorná-las).
+
 ## Decisões técnicas registradas
 - **Datas**: `startDate`/`endDate` são strings `yyyy-MM-dd` (data local); `scheduledAt`, `takenAt`,
   `createdAt`, `updatedAt` são timestamps em ms. Horários são `HH:mm` em hora local.
@@ -109,4 +132,4 @@ Testes ficam ao lado do código: `src/lib/*.test.ts`.
 - **Navegação inferior**: o 4º item se chama "Ajustes" (rota `/configuracoes`) porque "Configurações" não cabe em 360px.
 - **Rotas**: `/`, `/fotografar`, `/revisar`, `/medicamento/novo`, `/medicamento/:id/editar`, `/historico`, `/historico/:id`, `/exportar`, `/configuracoes`.
 - **Code splitting**: jsPDF e Tesseract são carregados sob demanda (`import()`).
-- **Versões**: Vite 6, Tailwind 3, React Router 6, TypeScript 5.9 (majors estáveis) em vez dos mais novos.
+- **Versões**: majors estáveis — Vite 6, Tailwind 3, React Router 6, TypeScript 5.9.

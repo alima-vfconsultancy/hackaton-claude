@@ -1,7 +1,7 @@
 {
   "name": "meu-remedio",
   "private": true,
-  "version": "1.0.0",
+  "version": "0.0.0",
   "type": "module",
   "scripts": {
     "dev": "vite",
@@ -10,7 +10,8 @@
     "test": "vitest run",
     "test:watch": "vitest",
     "icons": "node scripts/generate-icons.mjs",
-    "postinstall": "node scripts/copy-tesseract.mjs"
+    "postinstall": "node scripts/copy-tesseract.mjs",
+    "prepare": "husky"
   },
   "dependencies": {
     "date-fns": "^4.4.0",
@@ -25,12 +26,18 @@
     "tesseract.js": "^6.0.1"
   },
   "devDependencies": {
+    "@commitlint/cli": "^21.2.4",
+    "@commitlint/config-conventional": "^21.2.4",
+    "@semantic-release/changelog": "^7.0.0",
+    "@semantic-release/git": "^11.0.1",
     "@types/node": "^22.20.7",
     "@types/react": "^18.3.32",
     "@types/react-dom": "^18.3.7",
     "@vitejs/plugin-react": "^4.7.0",
     "autoprefixer": "^10.7.0",
+    "husky": "^9.1.7",
     "postcss": "^8.5.33",
+    "semantic-release": "^25.0.9",
     "tailwindcss": "^3.4.19",
     "typescript": "~5.9.3",
     "vite": "^6.4.6",
