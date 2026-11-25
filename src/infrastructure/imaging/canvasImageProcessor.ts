@@ -1,6 +1,14 @@
 import type { ImageProcessor, PreparedImage } from '../../application/ports';
+import { grayToRgba, rgbaToGray, type GrayImage } from './filters/grayImage';
+import { enhanceForOcr } from './filters/pipeline';
+import { sauvolaBinarize } from './filters/sauvola';
+import { computeOcrScale } from './filters/scale';
+import { estimateSkewAngle } from './filters/skew';
 
-/** Browser (canvas) image preprocessing to improve the OCR and to build thumbnails. */
+/** Browser (canvas) image preprocessing to improve the OCR and to build thumbnails. Pixel filters live in `./filters`. */
+
+/** Minimum tilt (degrees) worth straightening; smaller angles do not bother the OCR. */
+const MIN_DESKEW_DEGREES = 0.5;
 
 async function loadBitmap(file: Blob): Promise<ImageBitmap | HTMLImageElement> {
   if ('createImageBitmap' in window) {
@@ -23,68 +31,90 @@ async function loadBitmap(file: Blob): Promise<ImageBitmap | HTMLImageElement> {
   }
 }
 
-function drawScaled(source: ImageBitmap | HTMLImageElement, maxDimension: number): HTMLCanvasElement {
-  const width = 'naturalWidth' in source ? source.naturalWidth : source.width;
-  const height = 'naturalHeight' in source ? source.naturalHeight : source.height;
-  const scale = Math.min(1, maxDimension / Math.max(width, height));
+function sizeOf(source: ImageBitmap | HTMLImageElement): { width: number; height: number } {
+  return 'naturalWidth' in source
+    ? { width: source.naturalWidth, height: source.naturalHeight }
+    : { width: source.width, height: source.height };
+}
+
+/** Draws the image resized by `scale` on a white canvas. */
+function drawResized(source: ImageBitmap | HTMLImageElement, scale: number): HTMLCanvasElement {
+  const { width, height } = sizeOf(source);
   const canvas = document.createElement('canvas');
   canvas.width = Math.max(1, Math.round(width * scale));
   canvas.height = Math.max(1, Math.round(height * scale));
   const context = canvas.getContext('2d', { willReadFrequently: true })!;
+  context.imageSmoothingQuality = 'high';
   context.fillStyle = '#fff';
   context.fillRect(0, 0, canvas.width, canvas.height);
   context.drawImage(source, 0, 0, canvas.width, canvas.height);
   return canvas;
 }
 
-/**
- * Converts RGBA pixels to grayscale in place and stretches the contrast
- * (ignoring the darkest and brightest 1%). Images with no useful contrast stay gray.
- *
- * @param data - RGBA pixel data, as in `ImageData.data`
- */
-export function grayscaleAndContrast(data: Uint8ClampedArray): void {
-  const histogram = new Uint32Array(256);
-  for (let i = 0; i < data.length; i += 4) {
-    const gray = Math.round(0.299 * data[i] + 0.587 * data[i + 1] + 0.114 * data[i + 2]);
-    data[i] = data[i + 1] = data[i + 2] = gray;
-    histogram[gray]++;
-  }
-  const total = data.length / 4;
-  let accumulated = 0;
-  let low = 0;
-  let high = 255;
-  for (let value = 0; value < 256; value++) {
-    accumulated += histogram[value];
-    if (accumulated >= total * 0.01) { low = value; break; }
-  }
-  accumulated = 0;
-  for (let value = 255; value >= 0; value--) {
-    accumulated += histogram[value];
-    if (accumulated >= total * 0.01) { high = value; break; }
-  }
-  if (high - low < 30) return;
-  const factor = 255 / (high - low);
-  for (let i = 0; i < data.length; i += 4) {
-    const stretched = Math.max(0, Math.min(255, (data[i] - low) * factor));
-    data[i] = data[i + 1] = data[i + 2] = stretched;
-  }
+/** Draws the image reduced (never enlarged) so its longer side fits `maxDimension`. */
+function drawScaled(source: ImageBitmap | HTMLImageElement, maxDimension: number): HTMLCanvasElement {
+  const { width, height } = sizeOf(source);
+  return drawResized(source, Math.min(1, maxDimension / Math.max(width, height)));
 }
 
+function grayFromCanvas(canvas: HTMLCanvasElement): GrayImage {
+  const context = canvas.getContext('2d', { willReadFrequently: true })!;
+  const { data } = context.getImageData(0, 0, canvas.width, canvas.height);
+  return rgbaToGray(data, canvas.width, canvas.height);
+}
+
+function canvasFromGray(image: GrayImage): HTMLCanvasElement {
+  const canvas = document.createElement('canvas');
+  canvas.width = image.width;
+  canvas.height = image.height;
+  canvas.getContext('2d')!.putImageData(new ImageData(grayToRgba(image), image.width, image.height), 0, 0);
+  return canvas;
+}
+
+/** Rotates by `degrees` around the center, on a white page large enough for the whole image. */
+function rotateGray(image: GrayImage, degrees: number): GrayImage {
+  const radians = (degrees * Math.PI) / 180;
+  const cos = Math.abs(Math.cos(radians));
+  const sin = Math.abs(Math.sin(radians));
+  const canvas = document.createElement('canvas');
+  canvas.width = Math.round(image.width * cos + image.height * sin);
+  canvas.height = Math.round(image.width * sin + image.height * cos);
+  const context = canvas.getContext('2d', { willReadFrequently: true })!;
+  context.imageSmoothingQuality = 'high';
+  context.fillStyle = '#fff';
+  context.fillRect(0, 0, canvas.width, canvas.height);
+  context.translate(canvas.width / 2, canvas.height / 2);
+  context.rotate(radians);
+  context.drawImage(canvasFromGray(image), -image.width / 2, -image.height / 2);
+  return grayFromCanvas(canvas);
+}
+
+const toPngBlob = (image: GrayImage) =>
+  new Promise<Blob>((resolve, reject) =>
+    canvasFromGray(image).toBlob((blob) => (blob ? resolve(blob) : reject(new Error('Could not prepare the image.'))), 'image/png'),
+  );
+
+/**
+ * Builds the OCR variants of a photo: resized to a good letter size, specks and shadows
+ * removed, straightened, then (1) enhanced grayscale and (2) adaptive black and white.
+ */
 async function prepareForOcr(file: Blob): Promise<PreparedImage> {
   const bitmap = await loadBitmap(file);
   const previewDataUrl = drawScaled(bitmap, 1000).toDataURL('image/jpeg', 0.8);
 
-  const canvas = drawScaled(bitmap, 1800);
-  const context = canvas.getContext('2d', { willReadFrequently: true })!;
-  const image = context.getImageData(0, 0, canvas.width, canvas.height);
-  grayscaleAndContrast(image.data);
-  context.putImageData(image, 0, 0);
-  const ocrBlob = await new Promise<Blob>((resolve, reject) =>
-    canvas.toBlob((blob) => (blob ? resolve(blob) : reject(new Error('Could not prepare the image.'))), 'image/png'),
-  );
+  const { width, height } = sizeOf(bitmap);
+  let enhanced = enhanceForOcr(grayFromCanvas(drawResized(bitmap, computeOcrScale(width, height))));
   if ('close' in bitmap) bitmap.close();
-  return { ocrBlob, previewDataUrl };
+
+  let binarized = sauvolaBinarize(enhanced);
+  const tilt = estimateSkewAngle(binarized);
+  if (Math.abs(tilt) >= MIN_DESKEW_DEGREES) {
+    enhanced = rotateGray(enhanced, -tilt);
+    binarized = sauvolaBinarize(enhanced);
+  }
+
+  const ocrBlobs = [await toPngBlob(enhanced), await toPngBlob(binarized)];
+  return { ocrBlobs, previewDataUrl };
 }
 
 async function createThumbnail(dataUrl: string, maxDimension = 480, quality = 0.6): Promise<string> {
@@ -95,5 +125,5 @@ async function createThumbnail(dataUrl: string, maxDimension = 480, quality = 0.
   return canvas.toDataURL('image/jpeg', quality);
 }
 
-/** Image processor backed by the browser canvas (grayscale + contrast for OCR, JPEG thumbnails). */
+/** Image processor backed by the browser canvas (cleaned-up OCR variants, JPEG thumbnails). */
 export const createCanvasImageProcessor = (): ImageProcessor => ({ prepareForOcr, createThumbnail });
