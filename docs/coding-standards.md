@@ -32,8 +32,12 @@ export function montarResumoDose(remedio: Medication): string { /* ... */ }
 - Testes: ao lado do arquivo testado, mesmo nome + `.test.ts`/`.test.tsx`
   (ex.: `schedule.test.ts`).
 - Hooks: `useCamelCase.ts` (ex.: `useReminders.ts`).
+- Adaptadores de `infrastructure`: nome do detalhe técnico + papel (ex.: `tesseractOcrEngine.ts`, `dexieStoragePorts.ts`).
 
 ## Nomenclatura de código
+
+- Valores de enum e códigos armazenados são sempre em inglês (`'capsule'`, `'large'`, `'high'`); o rótulo em português vem de `src/shared/ptBR`.
+- Exceção: caminhos de rota (`/historico`) fazem parte da URL visível ao usuário e ficam em português.
 
 - Variáveis e funções: `camelCase`.
 - Tipos, interfaces, enums, componentes: `PascalCase`.
@@ -44,8 +48,8 @@ export function montarResumoDose(remedio: Medication): string { /* ... */ }
 
 ## Comentários e docstrings (TSDoc)
 
-Toda função **exportada** de `src/lib/` e `src/db/` (camadas application e
-infrastructure) deve ter um comentário TSDoc explicando o contrato — não a
+Toda função **exportada** de `src/domain/`, `src/application/` e `src/infrastructure/`
+deve ter um comentário TSDoc explicando o contrato — não a
 implementação:
 
 ```ts
@@ -75,7 +79,9 @@ Ver `CONTRIBUTING.md` para o padrão completo de commits, branches e PRs.
 
 ## Testes
 
-- Vitest, um arquivo de teste por módulo de `src/lib/`.
+- Vitest, um arquivo de teste por módulo de `src/domain/`, `src/application/` e `src/infrastructure/`.
 - Nome do teste descreve o comportamento, não a implementação (ver skill
   `test-driven-development`).
-- Nenhuma função nova em `src/lib/` é aceita sem teste correspondente.
+- Nenhuma função nova nessas camadas é aceita sem teste correspondente.
+- Títulos de teste em inglês, descrevendo o comportamento.
+- `src/architecture.test.ts` guarda a regra de dependência entre camadas; não o desative nem o enfraqueça para fazer uma mudança passar.

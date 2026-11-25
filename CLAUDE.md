@@ -28,36 +28,38 @@ npm run icons      # regenera os ícones PNG do PWA (scripts/generate-icons.mjs)
 ```
 
 ## Estrutura de pastas
+Quatro camadas explícitas + um núcleo de textos pt-BR (ver `docs/architecture.md` e ADR-0004):
 ```
 src/
+  domain/                  # regras puras, sem libs de UI/IO: tipos, agenda, doses, adesão, validação
+    time.ts                # LocalDate (yyyy-MM-dd), LocalTime (HH:mm), EpochMs e helpers
+    medication.ts          # Medication, MedicationDraft, Schedule, TreatmentPeriod, Dosage, validação por códigos
+    schedule.ts            # geração de horários / doses / prévia dos horários
+    dose.ts                # DoseLog, DoseStatus, regra de dose perdida
+    adherence.ts           # taxa de adesão e filtros de período/status
+    settings.ts, photo.ts
+  application/             # casos de uso + portas (interfaces); só conhece domain e shared
+    ports.ts               # repositórios, OcrEngine, PdfReportGenerator, ReminderNotifier...
+    createApplication.ts   # monta os serviços a partir das portas
+    medicationService.ts, doseService.ts, reminderService.ts, settingsService.ts
+    reportService.ts, backup.ts, sampleData.ts, syncDoses.ts
+    prescriptionParser.ts  # texto do OCR -> sugestões com confiança high/low
+    testing/               # fakes em memória usados nos testes
+  infrastructure/          # adaptadores das portas (único lugar com Dexie/Tesseract/jsPDF/Web APIs)
+    persistence/dexie/     # schema, repositórios e transações (IndexedDB)
+    ocr/, imaging/, pdf/, calendar/, notifications/, files/
+  presentation/            # React: components/, pages/, hooks/, forms/, i18n/
+  shared/ptBR/             # textos e formatação pt-BR (rótulos, datas, frequência); usado por todas as camadas
+  composition-root.ts      # único ponto que liga adaptadores às portas (exporta `app`)
   main.tsx, App.tsx, index.css
-  types.ts                 # Medication, DoseLog, Settings e enums
-  db/db.ts                 # Dexie: tabelas medications, doseLogs, settings, photos
-  db/repo.ts               # operações de alto nível (salvar, pausar, encerrar, excluir, marcar dose)
-  lib/                     # LÓGICA PURA E TESTÁVEL (sem React)
-    schedule.ts            # geração de horários / doses / prévia em texto
-    prescriptionParser.ts  # texto do OCR -> sugestões com confiança alta/baixa
-    maintenance.ts         # materializa doses, marca "missed", encerra tratamentos vencidos
-    ocr.ts                 # wrapper do Tesseract.js
-    imagePreprocess.ts     # canvas: redimensiona, cinza, contraste; miniatura
-    ics.ts                 # gera arquivo .ics (RRULE + VALARM)
-    pdf.ts                 # gera PDF A4 (jsPDF + autotable)
-    backup.ts              # exportar/importar JSON + validação
-    adherence.ts            # cálculo de taxa de adesão (doses tomadas / previstas)
-    notifications.ts       # permissão e disparo via service worker
-    format.ts              # formatação pt-BR (datas, frequência, dose)
-    download.ts             # helper de download de arquivo (PDF, .ics, JSON)
-    sampleData.ts          # dados de exemplo (modo dev)
-  components/              # UI reutilizável (DoseCard, MedicationForm, BottomNav...)
-  pages/                   # uma por tela
-  hooks/                   # useSettings, useReminders...
 public/
   icons/                   # ícones do PWA
   tesseract/               # worker + core wasm do Tesseract (copiados no postinstall, git-ignored)
   sw-notifications.js      # handler de notificationclick importado pelo SW
 scripts/                   # utilitários de build (ícones, cópia do Tesseract)
 ```
-Testes ficam ao lado do código: `src/lib/*.test.ts`.
+Testes ficam ao lado do código (`*.test.ts`). `src/architecture.test.ts` verifica a regra de dependência
+entre camadas e falha se alguém importar Dexie/Tesseract/jsPDF fora de `infrastructure`.
 
 ## Regras de segurança (inegociáveis)
 1. **O OCR nunca cria medicamentos nem alertas diretamente.** Todo resultado passa pela
@@ -102,13 +104,19 @@ separadamente e é tão vinculante quanto este arquivo:
   merge/PR; nenhum agente pode contorná-las).
 
 ## Decisões técnicas registradas
-- **Datas**: `startDate`/`endDate` são strings `yyyy-MM-dd` (data local); `scheduledAt`, `takenAt`,
-  `createdAt`, `updatedAt` são timestamps em ms. Horários são `HH:mm` em hora local.
-- **Duração**: ao salvar com `durationDays`, o app calcula `endDate = startDate + durationDays - 1`.
-  `endDate` é inclusivo (doses até 23:59 desse dia).
-- **Doses materializadas**: `maintenance.syncDoses()` cria registros `DoseLog` (status `pending`) do
+- **Modelo de dados normalizado** (inglês, valores de enum em inglês; rótulos pt-BR ficam em `shared/ptBR`):
+  `Medication` = `name`, `dosage: {amount:number, unit, perMl?} | null`, `form`
+  (`tablet|capsule|liquid|drops|ointment|injection|other`), `schedule` (união discriminada:
+  `{type:'interval', intervalHours, firstDoseTime}` ou `{type:'fixedTimes', times}`), `period`
+  (`{startDate, endDate?}`; sem `endDate` = uso contínuo), `status`, `prescriber`, `notes`,
+  `sourceOcrText?`, `photoId?`, `dosesTrackedFrom`. `Settings.fontScale` é `normal|large`.
+- **Datas**: `startDate`/`endDate` são strings `yyyy-MM-dd` (`LocalDate`, data local); `scheduledAt`, `takenAt`,
+  `createdAt`, `updatedAt` são timestamps em ms (`EpochMs`). Horários são `HH:mm` (`LocalTime`) em hora local.
+- **Duração**: `durationDays` existe só no formulário (`presentation/forms`); ao salvar, o app calcula
+  `endDate = startDate + durationDays - 1`. `endDate` é inclusivo (doses até 23:59 desse dia).
+- **Doses materializadas**: `syncDoses` (application) cria registros `DoseLog` (status `pending`) do
   início do acompanhamento até o fim do dia atual. Índice único `[medicationId+scheduledAt]` evita duplicatas.
-- **`trackFrom`** (campo interno em Medication): momento a partir do qual geramos doses. No cadastro
+- **`dosesTrackedFrom`** (campo interno em Medication): momento a partir do qual geramos doses. No cadastro
   e ao retomar/editar a agenda = agora − 2h. Assim, cadastrar um remédio iniciado há uma semana não
   gera dezenas de doses "perdidas" falsas.
 - **Editar agenda**: apaga as doses `pending`/`snoozed` do medicamento e gera de novo; doses
@@ -122,14 +130,19 @@ separadamente e é tão vinculante quanto este arquivo:
 - **"Nx ao dia"** no parser vira horários fixos sugeridos (1x 08:00; 2x 08:00/20:00; 3x 08:00/14:00/20:00;
   4x 08:00/12:00/16:00/20:00) marcados como confiança baixa para conferência.
 - **Dosagem**: o parser prefere a concentração (500 mg); sem ela, usa a quantidade por tomada (20 gotas).
+  Concentrações como `250mg/5ml` viram `{amount:250, unit:'mg', perMl:5}`.
+- **Esquema do IndexedDB**: o Dexie está na versão 2 (registros normalizados). A versão 1 era do protótipo
+  e seus dados são descartados no upgrade; backups `.json` antigos (`version: 1`) não são aceitos.
+- **Textos de erro**: domínio e aplicação devolvem *códigos* (`MedicationIssueCode`, `BackupError.code`);
+  as mensagens em português ficam em `presentation/i18n/messages.ts`.
 - **Tesseract offline**: worker e core (wasm) servidos da própria origem (`public/tesseract`, precacheados);
   dados do idioma baixados do jsDelivr na primeira leitura e cacheados (Workbox CacheFirst + IndexedDB do Tesseract).
 - **Fotos**: tabela `photos` separada; `Medication.photoId` aponta para a miniatura (uma receita pode ter vários remédios).
-- **Configurações** ficam no Dexie (tabela `settings`, chave `app`). `localStorage` não é usado.
-- **Dados de exemplo**: botão "Carregar exemplo" em Configurações quando `import.meta.env.DEV`
-  ou `VITE_DEMO=true`.
+- **Configurações** ficam no Dexie (tabela `settings`, linha de chave `app`, detalhe só do adaptador). `localStorage` não é usado.
+- **Dados de exemplo**: botão "Carregar exemplo" em Configurações quando `SAMPLE_DATA_ENABLED`
+  (`composition-root.ts`: `import.meta.env.DEV` ou `VITE_DEMO=true`).
 - Ícones via `lucide-react` (simples e tree-shakeable).
 - **Navegação inferior**: o 4º item se chama "Ajustes" (rota `/configuracoes`) porque "Configurações" não cabe em 360px.
-- **Rotas**: `/`, `/fotografar`, `/revisar`, `/medicamento/novo`, `/medicamento/:id/editar`, `/historico`, `/historico/:id`, `/exportar`, `/configuracoes`.
-- **Code splitting**: jsPDF e Tesseract são carregados sob demanda (`import()`).
+- **Rotas** (URLs voltadas ao usuário, por isso em português): `/`, `/fotografar`, `/revisar`, `/medicamento/novo`, `/medicamento/:id/editar`, `/historico`, `/historico/:id`, `/exportar`, `/configuracoes`.
+- **Code splitting**: jsPDF e Tesseract são carregados sob demanda (`import()` dentro dos adaptadores de `infrastructure`).
 - **Versões**: majors estáveis — Vite 6, Tailwind 3, React Router 6, TypeScript 5.9.
