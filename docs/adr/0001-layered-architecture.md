@@ -2,7 +2,7 @@
 
 ## Status
 
-Aceito
+Aceito. O layout de pastas foi detalhado e substituído pelo [ADR-0004](./0004-explicit-layer-folders.md).
 
 ## Contexto
 
