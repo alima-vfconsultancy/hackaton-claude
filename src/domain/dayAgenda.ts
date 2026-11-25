@@ -13,10 +13,13 @@ export type DayAgendaEntry =
  * Sorted ascending by display time.
  */
 export function buildDayAgenda(
-  _medications: Medication[],
-  _doses: DoseLog[],
+  medications: Medication[],
+  doses: DoseLog[],
   _dayStart: Date,
   _dayEnd: Date,
 ): DayAgendaEntry[] {
-  return [];
+  const byId = new Map(medications.map((medication) => [medication.id, medication]));
+  return doses
+    .filter((dose) => byId.has(dose.medicationId))
+    .map((dose) => ({ kind: 'logged' as const, medication: byId.get(dose.medicationId)!, dose }));
 }
