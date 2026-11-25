@@ -1,3 +1,4 @@
+import { createAgendaService, type AgendaService } from './agendaService';
 import { createBackupService, type BackupService } from './backup';
 import { createDoseService, type DoseService } from './doseService';
 import { createMedicationService, type MedicationService } from './medicationService';
@@ -19,6 +20,8 @@ export interface Application {
   backup: BackupService;
   reports: ReportService;
   sampleData: SampleDataService;
+  /** Calendar tab: day agenda and month markers (distinct from `calendar`, the `.ics` exporter below). */
+  agenda: AgendaService;
   /** Device capabilities, exposed as they are. */
   ocr: OcrEngine;
   imaging: ImageProcessor;
@@ -40,6 +43,7 @@ export function createApplication(ports: ApplicationPorts): Application {
     backup: createBackupService(ports),
     reports: createReportService(ports, ports.pdf),
     sampleData: createSampleDataService(medications),
+    agenda: createAgendaService(ports),
     ocr: ports.ocr,
     imaging: ports.imaging,
     calendar: ports.calendar,
