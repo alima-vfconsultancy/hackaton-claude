@@ -7,3 +7,4 @@ dev-dist
 public/tesseract
 coverage
 .DS_Store
+.claude/

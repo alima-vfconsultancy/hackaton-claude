@@ -78,6 +78,30 @@ Testes ficam ao lado do código: `src/lib/*.test.ts`.
 - Linguagem simples; mensagens de erro dizem o que fazer. Sem animações desnecessárias.
 - Navegação inferior com 4 itens: Hoje, Histórico, Exportar, Configurações.
 
+## Processo, arquitetura e governança
+
+Este projeto é construído por 5 desenvolvedores que usam exclusivamente
+agentes de IA. O processo completo (plano aprovado → TDD → revisor
+independente → PR → merge humano → release automático) está documentado
+separadamente e é tão vinculante quanto este arquivo:
+
+- [`docs/arquitetura.md`](./docs/arquitetura.md) — camadas (domain/application/
+  infrastructure/presentation) e regra de dependência entre pastas.
+- [`docs/processo-de-desenvolvimento.md`](./docs/processo-de-desenvolvimento.md) —
+  papéis (coordenador/executor/revisor independente), TDD obrigatório, gate
+  de aprovação humana antes de qualquer código.
+- [`docs/padroes-de-codigo.md`](./docs/padroes-de-codigo.md) — nomenclatura e
+  **idioma: código sempre em inglês, interface sempre em português**.
+- [`docs/templates/plano-de-entrega.md`](./docs/templates/plano-de-entrega.md) —
+  template obrigatório antes de iniciar qualquer tarefa.
+- [`docs/adr/`](./docs/adr/) — decisões arquiteturais registradas.
+- [`CONTRIBUTING.md`](./CONTRIBUTING.md) — branches, Conventional Commits,
+  Pull Requests, versionamento/release automático.
+
+Regras que nenhum agente pode contornar: nunca fazer merge/push direto em
+`main`; nunca colar trechos de conversa do chat na descrição de commits/PRs;
+sempre abrir PR a partir de uma branch atualizada com `main` e sem conflitos.
+
 ## Decisões técnicas registradas
 - **Datas**: `startDate`/`endDate` são strings `yyyy-MM-dd` (data local); `scheduledAt`, `takenAt`,
   `createdAt`, `updatedAt` são timestamps em ms. Horários são `HH:mm` em hora local.
