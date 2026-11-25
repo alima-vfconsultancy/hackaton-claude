@@ -1,9 +1,10 @@
+import type { Allergy } from '../../domain/allergy';
 import { isOpen, type DoseLog } from '../../domain/dose';
 import type { Medication } from '../../domain/medication';
 import type { PrescriptionPhoto } from '../../domain/photo';
 import type { Settings } from '../../domain/settings';
 import type {
-  DoseRepository, MedicationRepository, PhotoRepository, ReminderNotifier, SettingsRepository, StoragePorts,
+  AllergyRepository, DoseRepository, MedicationRepository, PhotoRepository, ReminderNotifier, SettingsRepository, StoragePorts,
 } from '../ports';
 
 /** Test helpers: storage ports backed by plain arrays (no real transaction rollback). */
@@ -18,12 +19,13 @@ export interface InMemoryStore {
   medications: Medication[];
   doses: DoseLog[];
   photos: PrescriptionPhoto[];
+  allergies: Allergy[];
   settings?: Settings;
 }
 
 /** Storage ports backed by arrays; `store` exposes the raw state for assertions. */
 export function createInMemoryPorts(initial: Partial<InMemoryStore> = {}): StoragePorts & { store: InMemoryStore } {
-  const store: InMemoryStore = { medications: [], doses: [], photos: [], ...initial };
+  const store: InMemoryStore = { medications: [], doses: [], photos: [], allergies: [], ...initial };
   let counter = 0;
 
   const medications: MedicationRepository = {
@@ -85,6 +87,18 @@ export function createInMemoryPorts(initial: Partial<InMemoryStore> = {}): Stora
     },
   };
 
+  const allergies: AllergyRepository = {
+    listAll: async () => [...store.allergies],
+    add: async (allergy) => void store.allergies.push(allergy),
+    addMany: async (items) => void store.allergies.push(...items),
+    remove: async (id) => {
+      store.allergies = store.allergies.filter((a) => a.id !== id);
+    },
+    clear: async () => {
+      store.allergies = [];
+    },
+  };
+
   return {
     store,
     transactions: { run: (work) => work() },
@@ -93,6 +107,7 @@ export function createInMemoryPorts(initial: Partial<InMemoryStore> = {}): Stora
     doses,
     settings,
     photos,
+    allergies,
   };
 }
 
