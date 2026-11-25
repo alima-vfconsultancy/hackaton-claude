@@ -1,5 +1,6 @@
 import type { BackupErrorCode } from '../../application/errors';
 import type { MedicationFormIssueCode } from '../forms/medicationFormValues';
+import type { RequiredField } from '../forms/missingRequiredFields';
 
 /** Error messages always say what to do next. */
 export const MEDICATION_ISSUE_MESSAGES: Record<MedicationFormIssueCode, string> = {
@@ -13,6 +14,22 @@ export const MEDICATION_ISSUE_MESSAGES: Record<MedicationFormIssueCode, string> 
   duration_invalid: 'A duração deve ser de pelo menos 1 dia.',
   duration_required: 'Informe por quantos dias vai tomar, a data final ou marque uso contínuo.',
   end_before_start: 'A data final deve ser igual ou depois da data de início.',
+};
+
+/** Shown next to a required field that is empty: `notRead` when the prescription did not provide it, `empty` otherwise. */
+export const REQUIRED_FIELD_MESSAGES: Record<RequiredField, { notRead: string; empty: string }> = {
+  name: {
+    notRead: 'Não encontrei o nome do remédio na receita. Escreva o nome.',
+    empty: 'Falta o nome do remédio. Escreva o nome.',
+  },
+  schedule: {
+    notRead: 'Não encontrei a frequência na receita. Informe de quantas em quantas horas ou os horários.',
+    empty: 'Falta informar a frequência: de quantas em quantas horas ou os horários.',
+  },
+  duration: {
+    notRead: 'Não encontrei por quanto tempo tomar. Informe os dias, a data final ou marque uso contínuo.',
+    empty: 'Falta informar por quanto tempo vai tomar. Informe os dias, a data final ou marque uso contínuo.',
+  },
 };
 
 export const BACKUP_ERROR_MESSAGES: Record<BackupErrorCode, string> = {
