@@ -4,6 +4,7 @@ import { Camera, PencilLine, Pill, X } from 'lucide-react';
 import { app } from '../../composition-root';
 import { isOpen } from '../../domain/dose';
 import { formatDayLong } from '../../shared/ptBR/format';
+import { BrandLogo } from '../components/BrandLogo';
 import { Disclaimer } from '../components/Disclaimer';
 import { DoseCard } from '../components/DoseCard';
 import { useLiveData } from '../hooks/useLiveData';
@@ -41,8 +42,11 @@ export default function TodayPage() {
   return (
     <div>
       <header className="mb-4">
-        <h1 className="text-2xl font-bold">Hoje</h1>
-        <p className="text-base text-slate-700">{formatDayLong(now).replace(/^./, (char) => char.toUpperCase())}</p>
+        <div className="mb-4">
+          <BrandLogo withTagline />
+        </div>
+        <h1 className="text-2xl">Hoje</h1>
+        <p className="text-base text-muted">{formatDayLong(now).replace(/^./, (char) => char.toUpperCase())}</p>
       </header>
 
       <Disclaimer className="mb-4" />
@@ -61,10 +65,10 @@ export default function TodayPage() {
       {today && entries.length === 0 ? (
         <div className="card text-center">
           <Pill className="mx-auto h-12 w-12 text-brand-700" aria-hidden="true" />
-          <h2 className="mt-2 text-xl font-bold">
+          <h2 className="mt-2 text-xl">
             {today.activeMedicationCount === 0 ? 'Vamos começar?' : 'Nenhuma dose para hoje'}
           </h2>
-          <p className="mt-1 text-base text-slate-700">
+          <p className="mt-1 text-base text-muted">
             {today.activeMedicationCount === 0
               ? 'Tire uma foto da sua receita e o app lê os remédios para você. Ou adicione um remédio manualmente. Leva menos de 1 minuto.'
               : 'Você não tem doses previstas para hoje. Aproveite o dia!'}

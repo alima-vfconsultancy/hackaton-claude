@@ -75,7 +75,7 @@ export default function MedicationEditPage() {
             <button type="button" className="btn-secondary w-full" onClick={() => app.calendar.download(medication)}>
               <CalendarPlus className="h-5 w-5" aria-hidden="true" /> Adicionar lembretes ao calendário
             </button>
-            <p className="text-sm text-slate-700">
+            <p className="text-sm text-muted">
               O calendário do celular avisa mesmo com o app fechado. É a forma mais confiável de receber lembretes.
             </p>
             {medication.status === 'active' && (

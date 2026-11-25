@@ -21,8 +21,9 @@ export function BottomNav() {
               to={to}
               end={end}
               className={({ isActive }) =>
-                `flex min-h-16 flex-col items-center justify-center gap-0.5 px-1 text-sm font-semibold ${
-                  isActive ? 'bg-brand-50 text-brand-800' : 'text-slate-700'
+                // Labels stay at the 18px brand minimum even with the large font, so the 4 items fit in 360px.
+                `flex min-h-16 flex-col items-center justify-center gap-0.5 px-0.5 text-[18px] font-semibold leading-tight ${
+                  isActive ? 'bg-mint text-brand-700' : 'text-muted'
                 }`
               }
             >

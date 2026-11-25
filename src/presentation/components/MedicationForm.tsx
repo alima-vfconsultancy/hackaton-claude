@@ -30,7 +30,7 @@ export function MedicationForm({
   const set = (patch: Partial<MedicationFormValues>) => onChange({ ...value, ...patch });
   const warn = (isUncertain?: boolean) => (isUncertain ? 'field-warn' : '');
   const hint = (isUncertain?: boolean) =>
-    isUncertain ? <p className="mt-1 text-sm font-semibold text-amber-900">⚠ Leitura incerta. Confira com a receita.</p> : null;
+    isUncertain ? <p className="mt-1 text-sm font-semibold text-ink">⚠ Leitura incerta. Confira com a receita.</p> : null;
   const schedulePreview = describeSchedulePreview(buildMedicationDraft(value).draft.schedule);
   const unitOptions = [...new Set([...DOSAGE_UNITS, value.dosageUnit])];
 
@@ -74,13 +74,13 @@ export function MedicationForm({
           onChange={(event) => set({ instructions: event.target.value })} placeholder="Ex.: após as refeições" />
       </div>
 
-      <fieldset className={`rounded-xl border-2 p-3 ${flags.schedule ? 'border-amber-600 bg-amber-50' : 'border-slate-300'}`}>
+      <fieldset className={`rounded-xl border-2 p-3 ${flags.schedule ? 'border-accent-600 bg-accent-100' : 'border-slate-300'}`}>
         <legend className="px-1 text-base font-semibold">Com que frequência?</legend>
         <div className="grid grid-cols-2 gap-2" role="radiogroup" aria-label="Tipo de frequência">
           {SCHEDULE_OPTIONS.map(([type, label]) => (
             <button key={type} type="button" role="radio" aria-checked={value.scheduleType === type}
               onClick={() => set({ scheduleType: type })}
-              className={`btn ${value.scheduleType === type ? 'bg-brand-700 text-white' : 'border-2 border-slate-400 bg-white text-slate-900'}`}>
+              className={`btn ${value.scheduleType === type ? 'bg-brand-700 text-white' : 'border-2 border-slate-400 bg-white text-ink'}`}>
               {label}
             </button>
           ))}
@@ -122,13 +122,13 @@ export function MedicationForm({
         )}
         {hint(flags.schedule)}
         {schedulePreview && (
-          <p className="mt-3 rounded-lg bg-brand-50 p-3 text-base font-semibold text-brand-800" aria-live="polite">
+          <p className="mt-3 rounded-lg bg-mint p-3 text-base font-semibold text-brand-700" aria-live="polite">
             {schedulePreview}
           </p>
         )}
       </fieldset>
 
-      <fieldset className={`rounded-xl border-2 p-3 ${flags.duration ? 'border-amber-600 bg-amber-50' : 'border-slate-300'}`}>
+      <fieldset className={`rounded-xl border-2 p-3 ${flags.duration ? 'border-accent-600 bg-accent-100' : 'border-slate-300'}`}>
         <legend className="px-1 text-base font-semibold">Período do tratamento</legend>
         <div>
           <label htmlFor={fieldId('start')} className="field-label">Começa em</label>

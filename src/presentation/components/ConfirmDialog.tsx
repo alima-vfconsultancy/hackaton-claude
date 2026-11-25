@@ -16,7 +16,7 @@ export function ConfirmDialog({
   return (
     <dialog ref={ref} onCancel={(e) => { e.preventDefault(); onCancel(); }}
       className="w-[calc(100%-2rem)] max-w-sm rounded-2xl p-5 backdrop:bg-black/50" aria-labelledby="dlg-title">
-      <h2 id="dlg-title" className="text-xl font-bold">{title}</h2>
+      <h2 id="dlg-title" className="text-xl">{title}</h2>
       <p className="mt-2 text-base">{message}</p>
       <div className="mt-4 grid grid-cols-2 gap-2">
         <button type="button" className="btn-ghost" onClick={onCancel}>Cancelar</button>
