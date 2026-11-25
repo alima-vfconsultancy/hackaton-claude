@@ -26,7 +26,7 @@ const ALLOWED_LAYERS: Record<Layer, Layer[]> = {
 /** Packages that may only be imported by the listed layers (everything else is forbidden). */
 const PACKAGE_OWNERS: Array<{ pattern: RegExp; layers: Layer[]; reason: string }> = [
   { pattern: /^(dexie|tesseract\.js|jspdf|jspdf-autotable)(\/|$)/, layers: ['infrastructure'], reason: 'adapter libraries belong to infrastructure' },
-  { pattern: /^(react|react-dom|react-router-dom|lucide-react)(\/|$)/, layers: ['presentation', 'bootstrap'], reason: 'UI libraries belong to presentation' },
+  { pattern: /^(react|react-dom|react-router-dom|lucide-react|react-day-picker)(\/|$)/, layers: ['presentation', 'bootstrap'], reason: 'UI libraries belong to presentation' },
 ];
 
 /** The single presentation file allowed to know about live queries. */
