@@ -8,7 +8,7 @@ const STATUS_STYLES: Record<DoseStatus, { Icon: typeof Clock; className: string 
   taken: { Icon: CheckCircle2, className: 'bg-green-100 text-green-900 border-green-500' },
   skipped: { Icon: SkipForward, className: 'bg-slate-200 text-ink border-slate-500' },
   missed: { Icon: AlertTriangle, className: 'bg-red-100 text-red-900 border-red-500' },
-  snoozed: { Icon: BellRing, className: 'bg-accent-100 text-ink border-accent-600' },
+  snoozed: { Icon: BellRing, className: 'bg-accent-500 text-ink border-accent-600' },
 };
 
 /** Status is always shown with color + icon + text. */
