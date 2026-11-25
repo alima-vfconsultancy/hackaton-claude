@@ -1,6 +1,6 @@
-# MeuRemédio — guia do projeto
+# Dose Certa — guia do projeto
 
-PWA mobile-first para organizar medicamentos: fotografar a
+**Dose Certa** ("Seu remédio na hora certa.") é um PWA mobile-first para organizar medicamentos: fotografar a
 receita → OCR local → revisão pelo usuário → agenda de doses com lembretes →
 histórico → PDF. Público: adultos e idosos. Simplicidade e legibilidade vêm antes
 de qualquer recurso extra.
@@ -16,6 +16,7 @@ de qualquer recurso extra.
 - vite-plugin-pwa (manifest + service worker Workbox)
 - Vitest (testes unitários)
 - lucide-react (ícones)
+- @fontsource/nunito + @fontsource/inter (fontes da marca embutidas no build)
 
 ## Comandos
 ```
@@ -75,8 +76,34 @@ entre camadas e falha se alguém importar Dexie/Tesseract/jsPDF fora de `infrast
    "Guardar foto da receita" (salva como miniatura JPEG comprimida).
 5. Exclusões e "Apagar todos os dados" exigem confirmação (dupla no caso de apagar tudo).
 
+## Identidade visual (Dose Certa)
+Referência visual: logo principal, versões, ícone do app e cores e tipografia definidos pela marca. Tokens em
+`tailwind.config.js` e `src/shared/brand.ts` (nome, assinatura e cores; `src/brandIdentity.test.ts` mantém os dois em sincronia).
+
+| Cor | Hex | Classe | Uso |
+|---|---|---|---|
+| Petróleo | `#0B5F6B` | `brand-700` | marca, títulos, botões principais (texto branco), item ativo |
+| Âmbar | `#F2A23A` | `accent-500` (`accent-100` p/ fundos) | destaque e alertas, **sempre com texto Grafite** |
+| Menta | `#E6F4F1` | `mint` / `brand-50` | fundos suaves, item ativo da navegação |
+| Grafite | `#1F2D30` | `ink` | texto principal |
+| Cinza | `#4B5B5E` | `muted` | texto secundário |
+| Névoa | `#F7FBFA` | `mist` | fundo do app |
+
+- **Âmbar nunca é cor de texto** (`text-amber-*`/`text-accent-*` são proibidos por teste): branco sobre âmbar tem contraste 2,1:1.
+- **Tipografia**: Nunito Extra Bold (`font-display`, aplicado em `h1`/`h2` pelo `index.css`) para marca e títulos;
+  Inter (`font-sans`) para o resto. Fontes embutidas via `@fontsource` (subconjunto latino, precacheado):
+  **nunca** carregar do Google Fonts (regra de segurança 3).
+- **Texto mínimo de 18 px**: `html` 18 px (20 px em `html.font-large`); `text-xs` e `text-sm` valem 1 rem. Os rótulos da
+  navegação inferior ficam fixos em 18 px para caber em 360 px com a letra grande.
+- **Logo**: `BrandLogo` (horizontal, com assinatura) no topo da tela Hoje; versão monocromática (Grafite) no cabeçalho
+  do PDF; versão negativa (fundo escuro) só documentada.
+- **Ícone do app**: fundo Petróleo, cápsula branca e âmbar com check. Geometria única em `scripts/brand-symbol.mjs`
+  (`npm run icons` gera `public/icons`); `BrandLogo.tsx` e o PDF repetem a mesma geometria.
+- **Nome**: "Dose Certa" em tudo que o usuário vê. Identificadores internos continuam `meu-remedio` (banco IndexedDB,
+  `BACKUP_APP_ID`, pacote npm, `PRODID`/UIDs do `.ics`) para não perder dados nem duplicar lembretes.
+
 ## Acessibilidade / design
-- Fonte base 16px (18px no modo grande: `html.font-large`), tudo em `rem`.
+- Fonte base 18px (20px no modo grande: `html.font-large`), tudo em `rem`.
 - Alvos de toque ≥ 48px (`min-h-12`), contraste WCAG AA, `label` em todo campo, foco visível (`focus-visible:ring`).
 - Status sempre com cor **e** ícone **e** texto.
 - Linguagem simples; mensagens de erro dizem o que fazer. Sem animações desnecessárias.

@@ -1,6 +1,8 @@
-# MeuRemédio
+# Dose Certa
 
-PWA mobile-first que ajuda uma pessoa a organizar seus medicamentos:
+<img src="public/icons/icon.svg" alt="" width="72" align="right" />
+
+**Seu remédio na hora certa.** PWA mobile-first que ajuda uma pessoa a organizar seus medicamentos:
 fotografar a receita → OCR local → revisão do usuário → agenda de doses com
 lembretes → histórico → exportação em PDF.
 
@@ -21,8 +23,15 @@ tecnologia. Simplicidade e legibilidade vêm antes de qualquer recurso extra.
 - date-fns (locale `ptBR`)
 - vite-plugin-pwa (manifest + service worker)
 - Vitest (testes unitários)
+- Fontes Nunito e Inter embutidas (`@fontsource`), sem Google Fonts
 
 Todos os dados ficam apenas no aparelho. Nenhum dado é enviado a servidores.
+
+## Identidade visual
+
+Petróleo `#0B5F6B` (marca e botões), Âmbar `#F2A23A` (destaques, sempre com texto escuro), Menta `#E6F4F1`,
+Grafite `#1F2D30` (texto), Cinza `#4B5B5E` (texto secundário) e Névoa `#F7FBFA` (fundo). Nunito Extra Bold nos
+títulos, Inter nos textos e no mínimo 18 px. Regras completas em [`CLAUDE.md`](./CLAUDE.md#identidade-visual-dose-certa).
 
 ## Como rodar
 
