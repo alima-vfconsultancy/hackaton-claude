@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { Navigate, useLocation, useNavigate } from 'react-router-dom';
-import { CheckCheck, Plus, Trash2 } from 'lucide-react';
+import { AlertCircle, CheckCheck, Plus, Trash2 } from 'lucide-react';
 import { parsePrescription, suggestionToDraft } from '../../application/prescriptionParser';
 import { app } from '../../composition-root';
 import { formatLocalDate } from '../../domain/time';
@@ -8,12 +8,17 @@ import { Disclaimer } from '../components/Disclaimer';
 import { MedicationForm, type FieldFlags } from '../components/MedicationForm';
 import { PageHeader } from '../components/PageHeader';
 import { buildMedicationDraft, createEmptyFormValues, medicationToFormValues, type MedicationFormValues } from '../forms/medicationFormValues';
+import {
+  ALL_REQUIRED_FIELDS, clearUnreadValues, detectUnreadFields, findEmptyRequiredFields, type RequiredFieldFlags,
+} from '../forms/missingRequiredFields';
 import { MEDICATION_ISSUE_MESSAGES } from '../i18n/messages';
 
 interface ReviewItem {
   key: number;
   values: MedicationFormValues;
   flags: FieldFlags;
+  /** Required fields the reading did not return: they start empty and highlighted. */
+  unread: RequiredFieldFlags;
 }
 
 /** Navigation state coming from the capture screen. */
@@ -33,20 +38,32 @@ export default function ReviewPage() {
   const suggested = useMemo<ReviewItem[]>(() => {
     if (!state) return [];
     const today = formatLocalDate(new Date());
-    return parsePrescription(state.text).map((suggestion, index) => ({
-      key: index,
-      values: medicationToFormValues(suggestionToDraft(suggestion, today, state.text)),
-      flags: {
-        name: suggestion.confidence.name === 'low',
-        dosage: suggestion.confidence.dosage === 'low',
-        schedule: suggestion.confidence.schedule === 'low',
-        duration: suggestion.confidence.duration === 'low',
-      },
-    }));
+    return parsePrescription(state.text).map((suggestion, index) => {
+      // Only the form layer reacts to what is missing; the parser output is used as it is.
+      const unread = detectUnreadFields(suggestion);
+      return {
+        key: index,
+        values: clearUnreadValues(medicationToFormValues(suggestionToDraft(suggestion, today, state.text)), unread),
+        flags: {
+          name: suggestion.confidence.name === 'low',
+          dosage: suggestion.confidence.dosage === 'low',
+          schedule: suggestion.confidence.schedule === 'low',
+          duration: suggestion.confidence.duration === 'low',
+        },
+        unread,
+      };
+    });
   }, [state]);
   const nothingDetected = suggested.length === 0;
   const initialItems = useMemo<ReviewItem[]>(
-    () => (suggested.length || !state ? suggested : [{ key: 0, values: { ...createEmptyFormValues(), sourceOcrText: state.text || undefined }, flags: {} }]),
+    () => (suggested.length || !state
+      ? suggested
+      : [{
+          key: 0,
+          values: clearUnreadValues({ ...createEmptyFormValues(), sourceOcrText: state.text || undefined }, ALL_REQUIRED_FIELDS),
+          flags: {},
+          unread: ALL_REQUIRED_FIELDS,
+        }]),
     [suggested, state],
   );
 
@@ -55,6 +72,7 @@ export default function ReviewPage() {
   const [keepPhoto, setKeepPhoto] = useState(false);
   const [errors, setErrors] = useState<string[]>([]);
   const [isSaving, setIsSaving] = useState(false);
+  const [isSubmitted, setIsSubmitted] = useState(false);
   const [errorAttempt, setErrorAttempt] = useState(0);
   const [errorTitle, setErrorTitle] = useState('');
   const errorBox = useRef<HTMLDivElement>(null);
@@ -68,9 +86,15 @@ export default function ReviewPage() {
   if (!state) return <Navigate to="/fotografar" replace />;
 
   const addItem = () => {
-    setItems((list) => [...list, { key: nextKey, values: { ...createEmptyFormValues(), sourceOcrText: state.text }, flags: {} }]);
+    setItems((list) => [...list, { key: nextKey, values: { ...createEmptyFormValues(), sourceOcrText: state.text }, flags: {}, unread: {} }]);
     setNextKey((key) => key + 1);
   };
+
+  // The notice goes away once the user fills in everything the reading did not return.
+  const hasUnreadFields = items.some((item) => {
+    const empty = findEmptyRequiredFields(item.values);
+    return (Object.keys(item.unread) as Array<keyof RequiredFieldFlags>).some((field) => item.unread[field] && empty[field]);
+  });
 
   /** Shows the errors and brings them into view (they sit below the photo, out of sight from the button). */
   function showErrors(messages: string[], title = 'Falta pouco! Corrija:') {
@@ -80,6 +104,7 @@ export default function ReviewPage() {
   }
 
   async function confirm() {
+    setIsSubmitted(true);
     const built = items.map((item) => buildMedicationDraft(item.values));
     const messages = built.flatMap(({ issues }, index) => issues.map((code) => `Remédio ${index + 1}: ${MEDICATION_ISSUE_MESSAGES[code]}`));
     if (items.length === 0) messages.push('Adicione pelo menos um remédio ou volte para a tela inicial.');
@@ -111,6 +136,12 @@ export default function ReviewPage() {
           ? 'Não consegui identificar remédios nesta receita. Você pode preencher manualmente, sem perder a foto.'
           : 'O app tentou ler sua receita. Confira cada campo com a receita. Campos em amarelo estão incertos. Nada é salvo até você confirmar.'}
       </p>
+      {hasUnreadFields && (
+        <p className="mb-4 flex items-start gap-2 rounded-xl border-2 border-red-700 bg-red-50 p-3 text-base font-semibold text-red-950">
+          <AlertCircle className="mt-0.5 h-5 w-5 shrink-0" aria-hidden="true" />
+          <span>Algumas informações obrigatórias não foram encontradas na receita. Preencha os campos em vermelho para continuar.</span>
+        </p>
+      )}
 
       {state.photo && (
         <details className="card mb-4" open>
@@ -142,7 +173,7 @@ export default function ReviewPage() {
                 <Trash2 className="h-5 w-5" aria-hidden="true" /> Remover
               </button>
             </div>
-            <MedicationForm value={item.values} flags={item.flags}
+            <MedicationForm value={item.values} flags={item.flags} unread={item.unread} isSubmitted={isSubmitted}
               onChange={(values) => setItems((list) => list.map((other) => (other.key === item.key ? { ...other, values } : other)))} />
           </section>
         ))}

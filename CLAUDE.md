@@ -20,7 +20,7 @@ de qualquer recurso extra.
 ## Comandos
 ```
 npm install        # instala dependências (copia os arquivos do Tesseract para public/tesseract via postinstall)
-npm run dev        # servidor de desenvolvimento (botão "Carregar exemplo" aparece em Configurações)
+npm run dev        # servidor de desenvolvimento
 npm run build      # typecheck (tsc -b) + build de produção em dist/
 npm run preview    # serve o build (use para testar PWA/offline)
 npm test           # Vitest (uma execução)
@@ -73,7 +73,8 @@ entre camadas e falha se alguém importar Dexie/Tesseract/jsPDF fora de `infrast
    (cacheados pelo service worker e pelo próprio Tesseract).
 4. A foto da receita **não** é guardada, a menos que o usuário marque
    "Guardar foto da receita" (salva como miniatura JPEG comprimida).
-5. Exclusões e "Apagar todos os dados" exigem confirmação (dupla no caso de apagar tudo).
+5. Exclusões exigem confirmação. Se "Apagar todos os dados" voltar para a tela, exige confirmação dupla
+   (hoje a opção não aparece na interface; ver "Tela Ajustes da POC").
 
 ## Acessibilidade / design
 - Fonte base 16px (18px no modo grande: `html.font-large`), tudo em `rem`.
@@ -146,8 +147,11 @@ separadamente e é tão vinculante quanto este arquivo:
   `rng`→`mg`, `cornprimido`→`comprimido` antes do parser (nunca mexe no nome do remédio).
 - **Fotos**: tabela `photos` separada; `Medication.photoId` aponta para a miniatura (uma receita pode ter vários remédios).
 - **Configurações** ficam no Dexie (tabela `settings`, linha de chave `app`, detalhe só do adaptador). `localStorage` não é usado.
-- **Dados de exemplo**: botão "Carregar exemplo" em Configurações quando `SAMPLE_DATA_ENABLED`
-  (`composition-root.ts`: `import.meta.env.DEV` ou `VITE_DEMO=true`).
+- **Tela Ajustes da POC**: só Notificações, Tamanho da letra e Instalar na tela inicial. Backup (exportar/importar
+  JSON), Demonstração ("Carregar exemplo") e "Apagar todos os dados" foram tirados da tela; por ser POC, o usuário
+  não tem como salvar ou recuperar os dados. Os serviços `app.backup` (inclui `wipeAll`) e `app.sampleData`, o
+  `SAMPLE_DATA_ENABLED` (`composition-root.ts`) e as mensagens de `BackupError` continuam no código, sem uso na
+  interface. `SettingsPage.test.ts` garante que as opções não voltem por engano.
 - Ícones via `lucide-react` (simples e tree-shakeable).
 - **Navegação inferior**: o 4º item se chama "Ajustes" (rota `/configuracoes`) porque "Configurações" não cabe em 360px.
 - **Rotas** (URLs voltadas ao usuário, por isso em português): `/`, `/fotografar`, `/revisar`, `/medicamento/novo`, `/medicamento/:id/editar`, `/historico`, `/historico/:id`, `/exportar`, `/configuracoes`.
