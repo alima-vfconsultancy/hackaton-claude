@@ -3,10 +3,11 @@ import { NAV_ITEMS } from './BottomNav';
 
 describe('BottomNav', () => {
   it('shows the five main sections in order, with Alergias in place of Exportar', () => {
+    // Short labels: at the 18px brand minimum, "Calendário" and "Histórico" overflow a 360px bar.
     expect(NAV_ITEMS.map(({ to, label }) => [to, label])).toEqual([
       ['/', 'Hoje'],
-      ['/calendario', 'Calendário'],
-      ['/historico', 'Histórico'],
+      ['/calendario', 'Agenda'],
+      ['/historico', 'Registro'],
       ['/alergias', 'Alergias'],
       ['/configuracoes', 'Ajustes'],
     ]);

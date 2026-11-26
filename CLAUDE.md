@@ -108,7 +108,7 @@ Referência visual: logo principal, versões, ícone do app e cores e tipografia
 - Alvos de toque ≥ 48px (`min-h-12`), contraste WCAG AA, `label` em todo campo, foco visível (`focus-visible:ring`).
 - Status sempre com cor **e** ícone **e** texto.
 - Linguagem simples; mensagens de erro dizem o que fazer. Sem animações desnecessárias.
-- Navegação inferior com 5 itens (máximo, para caber legível em 360px): Hoje, Calendário, Histórico, Alergias, Ajustes.
+- Navegação inferior com 5 itens (máximo, para caber legível em 360px): Hoje, Agenda, Registro, Alergias, Ajustes.
 
 ## Processo, arquitetura e governança
 
@@ -177,7 +177,9 @@ separadamente e é tão vinculante quanto este arquivo:
 - Ícones via `lucide-react` (simples e tree-shakeable).
 - **Navegação inferior**: o último item se chama "Ajustes" (rota `/configuracoes`) porque "Configurações" não cabe em 360px.
   Alergias tem aba própria (`/alergias`) por ser um item de segurança que precisa de visibilidade; para caber, Exportar
-  saiu da barra e foi para Ajustes. `BottomNav.test.ts` fixa os itens e o limite de 5.
+  saiu da barra e foi para Ajustes. Com 5 itens, cada rótulo tem ~72 px a 18 px: por isso a barra usa "Agenda"
+  (`/calendario`) e "Registro" (`/historico`) em vez de "Calendário" e "Histórico", que transbordavam, e os links não
+  têm padding lateral. Os títulos das telas continuam "Calendário" e "Histórico". `BottomNav.test.ts` fixa os itens e o limite de 5.
 - **Rotas** (URLs voltadas ao usuário, por isso em português): `/`, `/calendario`, `/fotografar`, `/revisar`, `/medicamento/novo`, `/medicamento/:id/editar`, `/historico`, `/historico/:id`, `/alergias`, `/exportar`, `/configuracoes`.
 - **Code splitting**: jsPDF e Tesseract são carregados sob demanda (`import()` dentro dos adaptadores de `infrastructure`).
 - **Versões**: majors estáveis — Vite 6, Tailwind 3, React Router 6, TypeScript 5.9.

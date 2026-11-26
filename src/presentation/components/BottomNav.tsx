@@ -1,11 +1,11 @@
 import { NavLink } from 'react-router-dom';
 import { CalendarDays, History, House, Settings, ShieldAlert } from 'lucide-react';
 
-// At most five items: more than that makes the labels unreadable at 360px.
+// At most five items with short labels: at 18px each label must fit in ~70px on a 360px screen.
 export const NAV_ITEMS = [
   { to: '/', label: 'Hoje', Icon: House, end: true },
-  { to: '/calendario', label: 'Calendário', Icon: CalendarDays, end: false },
-  { to: '/historico', label: 'Histórico', Icon: History, end: false },
+  { to: '/calendario', label: 'Agenda', Icon: CalendarDays, end: false },
+  { to: '/historico', label: 'Registro', Icon: History, end: false },
   { to: '/alergias', label: 'Alergias', Icon: ShieldAlert, end: false },
   { to: '/configuracoes', label: 'Ajustes', Icon: Settings, end: false },
 ];
@@ -23,8 +23,8 @@ export function BottomNav() {
               to={to}
               end={end}
               className={({ isActive }) =>
-                // Labels stay at the 18px brand minimum even with the large font, so the 4 items fit in 360px.
-                `flex min-h-16 flex-col items-center justify-center gap-0.5 px-0.5 text-[18px] font-semibold leading-tight ${
+                // Labels stay at the 18px brand minimum even with the large font, so the 5 items fit in 360px.
+                `flex min-h-16 flex-col items-center justify-center gap-0.5 px-0 text-[18px] font-semibold leading-tight ${
                   isActive ? 'bg-mint text-brand-700' : 'text-muted'
                 }`
               }
