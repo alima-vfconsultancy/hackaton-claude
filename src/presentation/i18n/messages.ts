@@ -55,3 +55,12 @@ export const AI_CHECK_STATUS_MESSAGES = {
   no_allergies: 'Cadastre suas alergias em Ajustes para usar esta verificação.',
   unavailable: 'A verificação por IA não está ativada neste app.',
 } as const;
+
+/** Result of asking the browser for permission to show reminders. */
+export const NOTIFICATION_PERMISSION_MESSAGES = {
+  granted: 'Avisos ativados. O celular vai avisar na hora de cada remédio.',
+  denied:
+    'Os avisos foram bloqueados. Para ativar, abra as configurações do navegador, permita notificações para este app e tente de novo.',
+  unsupported: 'Este navegador não permite avisos. Use "Adicionar lembretes ao calendário" em cada remédio.',
+  default: 'Os avisos não foram ativados. Toque de novo e escolha "Permitir".',
+} as const;

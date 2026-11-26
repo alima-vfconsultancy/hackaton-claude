@@ -7,6 +7,7 @@ import { formatDayLong } from '../../shared/ptBR/format';
 import { BrandLogo } from '../components/BrandLogo';
 import { Disclaimer } from '../components/Disclaimer';
 import { DoseCard } from '../components/DoseCard';
+import { EnableRemindersCard } from '../components/EnableRemindersCard';
 import { useLiveData } from '../hooks/useLiveData';
 import { useSettings } from '../hooks/useSettings';
 
@@ -50,6 +51,8 @@ export default function TodayPage() {
       </header>
 
       <Disclaimer className="mb-4" />
+
+      <EnableRemindersCard />
 
       {missedNotice > 0 && (
         <div role="alert" className="mb-4 flex items-start gap-2 rounded-xl border-2 border-red-600 bg-red-50 p-3 text-red-950">
