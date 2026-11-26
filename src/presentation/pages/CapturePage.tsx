@@ -26,7 +26,7 @@ export default function CapturePage() {
     try {
       const prepared = await app.imaging.prepareForOcr(file);
       setPhoto(prepared.previewDataUrl);
-      job.current = app.ocr.recognize(prepared.ocrBlob, setProgress);
+      job.current = app.ocr.recognize(prepared.ocrBlobs, setProgress);
       const text = await job.current.result;
       navigate('/revisar', { state: { photo: prepared.previewDataUrl, text } });
     } catch (caught) {
