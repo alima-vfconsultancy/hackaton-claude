@@ -8,6 +8,7 @@ import type { Dosage, DosageUnit, MedicationDraft, MedicationForm, Schedule } fr
 import { computeEndDate } from '../domain/schedule';
 import type { LocalDate, LocalTime } from '../domain/time';
 import { DOSAGE_UNIT_LABELS } from '../shared/ptBR/labels';
+import { cleanupOcrText } from './ocrTextCleanup';
 
 export type Confidence = 'high' | 'low';
 
@@ -252,7 +253,7 @@ function buildSuggestion(block: string[], prescriber?: string): PrescriptionSugg
  * @returns suggestions in reading order; empty when no medication was recognized
  */
 export function parsePrescription(rawText: string): PrescriptionSuggestion[] {
-  const text = rawText.normalize('NFC');
+  const text = cleanupOcrText(rawText.normalize('NFC'));
   const doctor = text.match(/\b(?:dr|dra)\.?\s+([A-Za-zÀ-ÿ]+(?:\s+[A-Za-zÀ-ÿ]+){0,2})/i);
   const doctorWords = doctor ? doctor[1].split(/\s+/) : [];
   const stop = doctorWords.findIndex((word) => /^(crm|cpf|rg|cro)$/i.test(word));

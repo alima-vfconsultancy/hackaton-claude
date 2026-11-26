@@ -1,4 +1,4 @@
-import { useMemo, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import { Navigate, useLocation, useNavigate } from 'react-router-dom';
 import { AlertCircle, CheckCheck, Plus, Trash2 } from 'lucide-react';
 import { parsePrescription, suggestionToDraft } from '../../application/prescriptionParser';
@@ -76,6 +76,16 @@ export default function ReviewPage() {
   const [errors, setErrors] = useState<string[]>([]);
   const [isSaving, setIsSaving] = useState(false);
   const [isSubmitted, setIsSubmitted] = useState(false);
+  const [errorAttempt, setErrorAttempt] = useState(0);
+  const [errorTitle, setErrorTitle] = useState('');
+  const errorBox = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    if (!errorAttempt) return;
+    errorBox.current?.scrollIntoView({ block: 'center' });
+    errorBox.current?.focus({ preventScroll: true });
+  }, [errorAttempt]);
+
   const allergies = useLiveData(() => app.allergies.list());
 
   if (!state) return <Navigate to="/fotografar" replace />;
@@ -91,18 +101,34 @@ export default function ReviewPage() {
     return (Object.keys(item.unread) as Array<keyof RequiredFieldFlags>).some((field) => item.unread[field] && empty[field]);
   });
 
+  /** Shows the errors and brings them into view (they sit below the photo, out of sight from the button). */
+  function showErrors(messages: string[], title = 'Falta pouco! Corrija:') {
+    setErrorTitle(title);
+    setErrors(messages);
+    setErrorAttempt((attempt) => attempt + 1);
+  }
+
   async function confirm() {
     setIsSubmitted(true);
     const built = items.map((item) => buildMedicationDraft(item.values));
     const messages = built.flatMap(({ issues }, index) => issues.map((code) => `Remédio ${index + 1}: ${MEDICATION_ISSUE_MESSAGES[code]}`));
     if (items.length === 0) messages.push('Adicione pelo menos um remédio ou volte para a tela inicial.');
-    setErrors(messages);
-    if (messages.length) { window.scrollTo({ top: 0 }); return; }
+    if (messages.length) { showErrors(messages); return; }
+    setErrors([]);
     setIsSaving(true);
-    // Only here, after the user's confirmation, something is stored.
-    const thumbnail = keepPhoto && state!.photo ? await app.imaging.createThumbnail(state!.photo) : undefined;
-    await app.medications.create(built.map(({ draft }) => draft), thumbnail);
-    navigate('/', { replace: true });
+    try {
+      // Only here, after the user's confirmation, something is stored.
+      const thumbnail = keepPhoto && state!.photo ? await app.imaging.createThumbnail(state!.photo) : undefined;
+      await app.medications.create(built.map(({ draft }) => draft), thumbnail);
+      navigate('/', { replace: true });
+    } catch {
+      setIsSaving(false);
+      showErrors([
+        keepPhoto
+          ? 'Não consegui salvar. Tente de novo. Se continuar, desmarque "Guardar foto da receita" e confirme outra vez.'
+          : 'Não consegui salvar. Tente de novo. Se continuar, feche e abra o app.',
+      ], 'Os remédios não foram salvos.');
+    }
   }
 
   return (
@@ -136,8 +162,8 @@ export default function ReviewPage() {
       )}
 
       {errors.length > 0 && (
-        <div role="alert" className="mb-4 rounded-xl border-2 border-red-600 bg-red-50 p-3 text-red-950">
-          <p className="font-bold">Falta pouco! Corrija:</p>
+        <div ref={errorBox} tabIndex={-1} role="alert" className="mb-4 rounded-xl focus:outline-none focus-visible:ring border-2 border-red-600 bg-red-50 p-3 text-red-950">
+          <p className="font-bold">{errorTitle}</p>
           <ul className="list-disc pl-5">{errors.map((message) => <li key={message}>{message}</li>)}</ul>
         </div>
       )}
