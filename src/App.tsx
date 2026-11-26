@@ -1,7 +1,6 @@
 import { useEffect } from 'react';
 import { Route, Routes, useLocation } from 'react-router-dom';
-import { BottomNav } from './presentation/components/BottomNav';
-import { DueBanner } from './presentation/components/DueBanner';
+import { AppShell } from './presentation/components/AppShell';
 import { PageHeader } from './presentation/components/PageHeader';
 import { useNotificationActions } from './presentation/hooks/useNotificationActions';
 import { useReminders } from './presentation/hooks/useReminders';
@@ -17,9 +16,6 @@ import ReviewPage from './presentation/pages/ReviewPage';
 import SettingsPage from './presentation/pages/SettingsPage';
 import TodayPage from './presentation/pages/TodayPage';
 
-// Route paths are part of the user-facing URL, so they stay in Portuguese.
-const FULL_SCREEN_ROUTES = ['/fotografar', '/revisar'];
-
 export default function App() {
   const settings = useSettings();
   const { pathname } = useLocation();
@@ -34,29 +30,23 @@ export default function App() {
     window.scrollTo({ top: 0 });
   }, [pathname]);
 
-  const showNav = !FULL_SCREEN_ROUTES.includes(pathname);
-
   return (
-    <div className={`mx-auto min-h-screen max-w-md px-4 pt-4 ${pathname === '/' ? 'pb-64' : 'pb-24'}`}>
-      <a href="#content" className="sr-only focus:not-sr-only focus:absolute focus:z-30 focus:bg-white focus:p-2">Ir para o conteúdo</a>
-      <DueBanner due={due} />
-      <main id="content">
-        <Routes>
-          <Route path="/" element={<TodayPage />} />
-          <Route path="/calendario" element={<CalendarPage />} />
-          <Route path="/fotografar" element={<CapturePage />} />
-          <Route path="/revisar" element={<ReviewPage />} />
-          <Route path="/medicamento/novo" element={<MedicationEditPage />} />
-          <Route path="/medicamento/:id/editar" element={<MedicationEditPage />} />
-          <Route path="/historico" element={<HistoryPage />} />
-          <Route path="/historico/:id" element={<MedicationDetailPage />} />
-          <Route path="/alergias" element={<AllergiesPage />} />
-          <Route path="/exportar" element={<ExportPage />} />
-          <Route path="/configuracoes" element={<SettingsPage />} />
-          <Route path="*" element={<PageHeader title="Página não encontrada" back="/" />} />
-        </Routes>
-      </main>
-      {showNav && <BottomNav />}
-    </div>
+    <AppShell due={due}>
+      <Routes>
+        {/* Route paths are part of the user-facing URL, so they stay in Portuguese. */}
+        <Route path="/" element={<TodayPage />} />
+        <Route path="/calendario" element={<CalendarPage />} />
+        <Route path="/fotografar" element={<CapturePage />} />
+        <Route path="/revisar" element={<ReviewPage />} />
+        <Route path="/medicamento/novo" element={<MedicationEditPage />} />
+        <Route path="/medicamento/:id/editar" element={<MedicationEditPage />} />
+        <Route path="/historico" element={<HistoryPage />} />
+        <Route path="/historico/:id" element={<MedicationDetailPage />} />
+        <Route path="/alergias" element={<AllergiesPage />} />
+        <Route path="/exportar" element={<ExportPage />} />
+        <Route path="/configuracoes" element={<SettingsPage />} />
+        <Route path="*" element={<PageHeader title="Página não encontrada" back="/" />} />
+      </Routes>
+    </AppShell>
   );
 }

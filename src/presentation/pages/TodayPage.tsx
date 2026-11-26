@@ -44,62 +44,66 @@ export default function TodayPage() {
   const nextDoseId = entries.find(({ dose }) => isOpen(dose))?.dose.id;
 
   return (
-    <div>
-      <header className="mb-4">
-        <div className="mb-4">
-          <BrandLogo withTagline />
-        </div>
-        <h1 className="text-2xl">Hoje</h1>
-        <p className="text-base text-muted">{formatDayLong(now).replace(/^./, (char) => char.toUpperCase())}</p>
-      </header>
+    <div className="lg:grid lg:grid-cols-[minmax(0,1fr)_15rem] lg:items-start lg:gap-6 xl:grid-cols-[minmax(0,1fr)_20rem] xl:gap-8">
+      <div className="min-w-0">
+        <header className="mb-4">
+          {/* From lg the logo lives in the side navigation. */}
+          <div className="mb-4 lg:hidden">
+            <BrandLogo withTagline />
+          </div>
+          <h1 className="text-2xl">Hoje</h1>
+          <p className="text-base text-muted">{formatDayLong(now).replace(/^./, (char) => char.toUpperCase())}</p>
+        </header>
 
-      <Disclaimer className="mb-4" />
+        <Disclaimer className="mb-4" />
 
-      {reminderNotice && (
-        <div role="alert" className="mb-4 flex items-start gap-2 rounded-xl border-2 border-red-600 bg-red-50 p-3 text-red-950">
-          <AlertCircle className="mt-0.5 h-5 w-5 shrink-0" aria-hidden="true" />
-          <p className="flex-1 text-base font-semibold">{reminderNotice}</p>
-          <button type="button" className="btn-ghost !min-h-10 !px-2" aria-label="Fechar aviso" onClick={() => navigate('/', { replace: true, state: null })}>
-            <X className="h-5 w-5" aria-hidden="true" />
-          </button>
-        </div>
-      )}
+        {reminderNotice && (
+          <div role="alert" className="mb-4 flex items-start gap-2 rounded-xl border-2 border-red-600 bg-red-50 p-3 text-red-950">
+            <AlertCircle className="mt-0.5 h-5 w-5 shrink-0" aria-hidden="true" />
+            <p className="flex-1 text-base font-semibold">{reminderNotice}</p>
+            <button type="button" className="btn-ghost !min-h-10 !px-2" aria-label="Fechar aviso" onClick={() => navigate('/', { replace: true, state: null })}>
+              <X className="h-5 w-5" aria-hidden="true" />
+            </button>
+          </div>
+        )}
 
-      <EnableRemindersCard />
+        <EnableRemindersCard />
 
-      {missedNotice > 0 && (
-        <div role="alert" className="mb-4 flex items-start gap-2 rounded-xl border-2 border-red-600 bg-red-50 p-3 text-red-950">
-          <p className="flex-1 text-base font-semibold">
-            Você deixou passar {missedNotice} {missedNotice === 1 ? 'dose' : 'doses'} desde a última vez. Veja abaixo e registre o que aconteceu.
-          </p>
-          <button type="button" className="btn-ghost !min-h-10 !px-2" aria-label="Fechar aviso" onClick={() => setMissedNotice(0)}>
-            <X className="h-5 w-5" aria-hidden="true" />
-          </button>
-        </div>
-      )}
+              {missedNotice > 0 && (
+          <div role="alert" className="mb-4 flex items-start gap-2 rounded-xl border-2 border-red-600 bg-red-50 p-3 text-red-950">
+            <p className="flex-1 text-base font-semibold">
+              Você deixou passar {missedNotice} {missedNotice === 1 ? 'dose' : 'doses'} desde a última vez. Veja abaixo e registre o que aconteceu.
+            </p>
+            <button type="button" className="btn-ghost !min-h-10 !px-2" aria-label="Fechar aviso" onClick={() => setMissedNotice(0)}>
+              <X className="h-5 w-5" aria-hidden="true" />
+            </button>
+          </div>
+        )}
 
-      {today && entries.length === 0 ? (
-        <div className="card text-center">
-          <Pill className="mx-auto h-12 w-12 text-brand-700" aria-hidden="true" />
-          <h2 className="mt-2 text-xl">
-            {today.activeMedicationCount === 0 ? 'Vamos começar?' : 'Nenhuma dose para hoje'}
-          </h2>
-          <p className="mt-1 text-base text-muted">
-            {today.activeMedicationCount === 0
-              ? 'Tire uma foto da sua receita e o app lê os remédios para você. Ou adicione um remédio manualmente. Leva menos de 1 minuto.'
-              : 'Você não tem doses previstas para hoje. Aproveite o dia!'}
-          </p>
-        </div>
-      ) : (
-        <ul className="space-y-3" aria-label="Doses de hoje">
-          {entries.map(({ dose, medication }) => (
-            <DoseCard key={dose.id} dose={dose} medication={medication} highlight={dose.id === nextDoseId} snoozeMinutes={settings.snoozeMinutes} />
-          ))}
-        </ul>
-      )}
+        {today && entries.length === 0 ? (
+          <div className="card text-center">
+            <Pill className="mx-auto h-12 w-12 text-brand-700" aria-hidden="true" />
+            <h2 className="mt-2 text-xl">
+              {today.activeMedicationCount === 0 ? 'Vamos começar?' : 'Nenhuma dose para hoje'}
+            </h2>
+            <p className="mt-1 text-base text-muted">
+              {today.activeMedicationCount === 0
+                ? 'Tire uma foto da sua receita e o app lê os remédios para você. Ou adicione um remédio manualmente. Leva menos de 1 minuto.'
+                : 'Você não tem doses previstas para hoje. Aproveite o dia!'}
+            </p>
+          </div>
+        ) : (
+          <ul className="space-y-3" aria-label="Doses de hoje">
+            {entries.map(({ dose, medication }) => (
+              <DoseCard key={dose.id} dose={dose} medication={medication} highlight={dose.id === nextDoseId} snoozeMinutes={settings.snoozeMinutes} />
+            ))}
+          </ul>
+        )}
+      </div>
 
-      <div className="fixed inset-x-0 bottom-16 z-10 pb-[env(safe-area-inset-bottom)]">
-        <div className="mx-auto max-w-md space-y-2 px-4 pb-2">
+      {/* Phones: fixed above the bottom bar. Desktop: a sticky column beside the doses. */}
+      <div className="fixed inset-x-0 bottom-16 z-10 pb-[env(safe-area-inset-bottom)] lg:sticky lg:inset-x-auto lg:bottom-auto lg:top-8 lg:pb-0">
+        <div className="mx-auto max-w-md space-y-2 px-4 pb-2 lg:max-w-none lg:px-0 lg:pb-0">
           <Link to="/fotografar" className="btn-primary w-full !min-h-14 text-lg shadow-lg">
             <Camera className="h-6 w-6" aria-hidden="true" /> Fotografar receita
           </Link>

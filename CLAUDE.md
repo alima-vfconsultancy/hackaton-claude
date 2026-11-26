@@ -7,7 +7,7 @@ de qualquer recurso extra.
 
 ## Stack
 - React 18 + TypeScript + Vite
-- Tailwind CSS 3 (mobile-first, 360–430px)
+- Tailwind CSS 3 (mobile-first, 360–430px; adapta para tablet `md` e desktop `lg`/`xl`, ver "Layout responsivo")
 - React Router 6
 - Dexie.js (IndexedDB) + dexie-react-hooks — **nada de backend; nada de localStorage para dados principais**
 - Tesseract.js (idioma `por`) rodando no navegador
@@ -108,7 +108,7 @@ Referência visual: logo principal, versões, ícone do app e cores e tipografia
 - Alvos de toque ≥ 48px (`min-h-12`), contraste WCAG AA, `label` em todo campo, foco visível (`focus-visible:ring`).
 - Status sempre com cor **e** ícone **e** texto.
 - Linguagem simples; mensagens de erro dizem o que fazer. Sem animações desnecessárias.
-- Navegação inferior com 5 itens (máximo, para caber legível em 360px): Hoje, Agenda, Registro, Alergias, Ajustes.
+- Navegação principal com 5 itens (máximo, para caber legível em 360px): Hoje, Agenda, Registro, Alergias, Ajustes. Barra inferior no mobile/tablet; barra lateral fixa a partir de `lg` (ver "Layout responsivo").
 
 ## Processo, arquitetura e governança
 
@@ -190,11 +190,25 @@ separadamente e é tão vinculante quanto este arquivo:
   `SAMPLE_DATA_ENABLED` (`composition-root.ts`) e as mensagens de `BackupError` continuam no código, sem uso na
   interface. `SettingsPage.test.ts` garante que as opções não voltem por engano.
 - Ícones via `lucide-react` (simples e tree-shakeable).
-- **Navegação inferior**: o último item se chama "Ajustes" (rota `/configuracoes`) porque "Configurações" não cabe em 360px.
+- **Navegação**: o último item se chama "Ajustes" (rota `/configuracoes`) porque "Configurações" não cabe em 360px.
   Alergias tem aba própria (`/alergias`) por ser um item de segurança que precisa de visibilidade; para caber, Exportar
   saiu da barra e foi para Ajustes. Com 5 itens, cada rótulo tem ~72 px a 18 px: por isso a barra usa "Agenda"
   (`/calendario`) e "Registro" (`/historico`) em vez de "Calendário" e "Histórico", que transbordavam, e os links não
-  têm padding lateral. Os títulos das telas continuam "Calendário" e "Histórico". `BottomNav.test.ts` fixa os itens e o limite de 5.
+  têm padding lateral. Os títulos das telas continuam "Calendário" e "Histórico". `navigationItems.test.ts` fixa os itens e o limite de 5.
+  `presentation/components/navigationItems.ts` guarda os itens e `shouldShowNavigation` (esconde a navegação em `/fotografar` e `/revisar`);
+  `MainNav` é um único `<nav>` responsivo (barra inferior; barra lateral com a logo a partir de `lg`) e `AppShell` é a moldura da página.
+- **Layout responsivo** (mobile-first: as classes base são o layout de celular, `md:`/`lg:`/`xl:` só acrescentam):
+
+  | Largura | Layout |
+  |---|---|
+  | `< md` (< 768px) | coluna `max-w-md`, barra inferior fixa, botões fixos na tela Hoje |
+  | `md` (≥ 768px) | conteúdo centralizado em `max-w-2xl`, mesma barra inferior; Histórico em 2 colunas |
+  | `lg` (≥ 1024px) | barra lateral fixa (`w-60`), conteúdo em `max-w-5xl`; Hoje com doses + coluna de ações (`15rem`) |
+  | `xl` (≥ 1280px) | Calendário, Detalhe e Ajustes em 2 colunas; coluna de ações da Hoje com `20rem` |
+
+  Formulários e fluxos lineares (Exportar, Alergias, Fotografar, Revisar, Editar) ficam limitados a `max-w-2xl`/`max-w-3xl`.
+  Larguras em `rem` (respeitam a letra grande); alvos de toque continuam ≥ 48px. O `manifest` não trava a orientação
+  (tablet/desktop). O CSS responsivo não é testável no Vitest (ambiente `node`); confira em 360, 768, 1024 e 1440px.
 - **Rotas** (URLs voltadas ao usuário, por isso em português): `/`, `/calendario`, `/fotografar`, `/revisar`, `/medicamento/novo`, `/medicamento/:id/editar`, `/historico`, `/historico/:id`, `/alergias`, `/exportar`, `/configuracoes`.
 - **Code splitting**: jsPDF e Tesseract são carregados sob demanda (`import()` dentro dos adaptadores de `infrastructure`).
 - **Versões**: majors estáveis — Vite 6, Tailwind 3, React Router 6, TypeScript 5.9.

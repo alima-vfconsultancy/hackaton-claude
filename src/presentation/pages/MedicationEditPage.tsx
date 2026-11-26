@@ -54,7 +54,7 @@ export default function MedicationEditPage() {
   );
 
   return (
-    <div className="pb-4">
+    <div className="mx-auto max-w-2xl pb-4">
       <PageHeader title={id ? 'Editar remédio' : 'Novo remédio'} back />
       <Disclaimer className="mb-4" />
       {issues.length > 0 && (
