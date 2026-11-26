@@ -132,7 +132,7 @@ export default function ReviewPage() {
   }
 
   return (
-    <div>
+    <div className="mx-auto max-w-3xl">
       <PageHeader title="Confira a leitura" back="/fotografar" />
       <Disclaimer className="mb-4" />
 

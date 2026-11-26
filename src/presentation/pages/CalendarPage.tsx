@@ -54,30 +54,33 @@ export default function CalendarPage() {
     <div>
       <PageHeader title="Calendário" />
 
-      <div className="card mb-4">
-        <DayPicker
-          mode="single"
-          required
-          locale={ptBR}
-          weekStartsOn={0}
-          month={month}
-          onMonthChange={setMonth}
-          selected={selectedDate}
-          onSelect={(date) => setSelectedDate(startOfDay(date))}
-          modifiers={{ hasDoses: (date) => datesWithDoses?.has(formatLocalDate(date)) ?? false }}
-          components={{ DayButton: DayButtonWithDoseDot }}
-        />
+      <div className="xl:grid xl:grid-cols-[24rem_minmax(0,1fr)] xl:items-start xl:gap-8">
+        <div className="card mb-4 xl:mb-0">
+          <DayPicker
+            mode="single"
+            required
+            locale={ptBR}
+            weekStartsOn={0}
+            month={month}
+            onMonthChange={setMonth}
+            selected={selectedDate}
+            onSelect={(date) => setSelectedDate(startOfDay(date))}
+            modifiers={{ hasDoses: (date) => datesWithDoses?.has(formatLocalDate(date)) ?? false }}
+            components={{ DayButton: DayButtonWithDoseDot }}
+          />
+        </div>
+        <div className="min-w-0">
+          <h2 className="mb-2 text-xl font-bold capitalize">{formatDayLong(selectedDate)}</h2>
+
+          {dayAgenda && dayAgenda.length === 0 ? (
+            <p className="card text-center text-base">Nenhuma dose prevista para este dia.</p>
+          ) : (
+            <ul className="space-y-3" aria-label="Doses do dia selecionado">
+              {(dayAgenda ?? []).map((entry) => <CalendarEntryCard key={entryKey(entry)} entry={entry} />)}
+            </ul>
+          )}
+        </div>
       </div>
-
-      <h2 className="mb-2 text-xl font-bold capitalize">{formatDayLong(selectedDate)}</h2>
-
-      {dayAgenda && dayAgenda.length === 0 ? (
-        <p className="card text-center text-base">Nenhuma dose prevista para este dia.</p>
-      ) : (
-        <ul className="space-y-3" aria-label="Doses do dia selecionado">
-          {(dayAgenda ?? []).map((entry) => <CalendarEntryCard key={entryKey(entry)} entry={entry} />)}
-        </ul>
-      )}
     </div>
   );
 }

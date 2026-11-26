@@ -47,7 +47,7 @@ export default function CapturePage() {
   const label = progress?.stage === 'reading' ? `Lendo a receita... ${progress.percent}%` : 'Preparando a leitura...';
 
   return (
-    <div>
+    <div className="mx-auto max-w-2xl">
       <PageHeader title="Fotografar receita" back="/" />
       <Disclaimer className="mb-4" />
 
