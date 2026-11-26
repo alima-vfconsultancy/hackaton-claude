@@ -37,6 +37,19 @@ describe('reminders.check', () => {
     expect(ports.store.doses[0].notifiedAt).toBe(NOW);
   });
 
+  it('alerts once when two checks overlap (timer, tab focus and StrictMode can run together)', async () => {
+    const { notifier, service } = setup();
+
+    const [first, second] = await Promise.all([
+      service.check({ notificationsEnabled: true }),
+      service.check({ notificationsEnabled: true }),
+    ]);
+
+    expect(first).toEqual(second);
+    expect(notifier.shown).toHaveLength(1);
+    expect(notifier.alerts).toBe(1);
+  });
+
   it('reports how many doses are due, for the counter on the tab and app icon', async () => {
     const { notifier, service } = setup([
       buildDose({ id: 'a', scheduledAt: NOW - 5 * MINUTE }),

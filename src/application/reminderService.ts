@@ -41,30 +41,39 @@ export function createReminderService(
   doseService: DoseService,
 ): ReminderService {
   const { medications, doses, settings } = ports;
+  /** Check in progress: overlapping calls share it, so a dose is never alerted twice. */
+  let running: Promise<DueDose[]> | null = null;
+
+  const runCheck = async (notificationsEnabled: boolean): Promise<DueDose[]> => {
+    await syncDoses();
+    const now = Date.now();
+    const [open, allMedications] = await Promise.all([doses.listOpen(), medications.list()]);
+    const byId = new Map(allMedications.map((medication) => [medication.id, medication]));
+
+    const due: DueDose[] = open
+      .filter((dose) => {
+        const delay = now - effectiveTime(dose);
+        return delay >= 0 && delay <= MISSED_AFTER_MS && byId.has(dose.medicationId);
+      })
+      .sort((a, b) => effectiveTime(a) - effectiveTime(b))
+      .map((dose) => ({ dose, medication: byId.get(dose.medicationId)! }));
+    notifier.showPendingCount(due.length);
+
+    const fresh = due.filter(({ dose }) => !dose.notifiedAt);
+    if (fresh.length) notifier.playAlert();
+    for (const { dose, medication } of fresh) {
+      if (notificationsEnabled) await notifier.showDoseReminder(dose, medication);
+      await doses.update(dose.id, { notifiedAt: now });
+    }
+    return due;
+  };
 
   return {
-    async check({ notificationsEnabled }) {
-      await syncDoses();
-      const now = Date.now();
-      const [open, allMedications] = await Promise.all([doses.listOpen(), medications.list()]);
-      const byId = new Map(allMedications.map((medication) => [medication.id, medication]));
-
-      const due: DueDose[] = open
-        .filter((dose) => {
-          const delay = now - effectiveTime(dose);
-          return delay >= 0 && delay <= MISSED_AFTER_MS && byId.has(dose.medicationId);
-        })
-        .sort((a, b) => effectiveTime(a) - effectiveTime(b))
-        .map((dose) => ({ dose, medication: byId.get(dose.medicationId)! }));
-      notifier.showPendingCount(due.length);
-
-      const fresh = due.filter(({ dose }) => !dose.notifiedAt);
-      if (fresh.length) notifier.playAlert();
-      for (const { dose, medication } of fresh) {
-        if (notificationsEnabled) await notifier.showDoseReminder(dose, medication);
-        await doses.update(dose.id, { notifiedAt: now });
-      }
-      return due;
+    check({ notificationsEnabled }) {
+      running ??= runCheck(notificationsEnabled).finally(() => {
+        running = null;
+      });
+      return running;
     },
 
     async handleNotificationAction(doseId, action) {
