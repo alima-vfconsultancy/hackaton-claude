@@ -1,12 +1,13 @@
 import { useEffect, useMemo, useState } from 'react';
-import { Link } from 'react-router-dom';
-import { Camera, PencilLine, Pill, X } from 'lucide-react';
+import { Link, useLocation, useNavigate } from 'react-router-dom';
+import { AlertCircle, Camera, PencilLine, Pill, X } from 'lucide-react';
 import { app } from '../../composition-root';
 import { isOpen } from '../../domain/dose';
 import { formatDayLong } from '../../shared/ptBR/format';
 import { BrandLogo } from '../components/BrandLogo';
 import { Disclaimer } from '../components/Disclaimer';
 import { DoseCard } from '../components/DoseCard';
+import { EnableRemindersCard } from '../components/EnableRemindersCard';
 import { useLiveData } from '../hooks/useLiveData';
 import { useSettings } from '../hooks/useSettings';
 
@@ -15,6 +16,9 @@ const REFRESH_INTERVAL_MS = 60_000;
 /** Home screen: the doses of today, with the next one highlighted. */
 export default function TodayPage() {
   const settings = useSettings();
+  const navigate = useNavigate();
+  // Set by useNotificationActions when a "Tomei"/"Adiar" tap on a notification changed nothing.
+  const reminderNotice = (useLocation().state as { reminderNotice?: string } | null)?.reminderNotice;
   const [missedNotice, setMissedNotice] = useState(0);
   const [tick, setTick] = useState(0);
 
@@ -53,7 +57,19 @@ export default function TodayPage() {
 
         <Disclaimer className="mb-4" />
 
-        {missedNotice > 0 && (
+        {reminderNotice && (
+          <div role="alert" className="mb-4 flex items-start gap-2 rounded-xl border-2 border-red-600 bg-red-50 p-3 text-red-950">
+            <AlertCircle className="mt-0.5 h-5 w-5 shrink-0" aria-hidden="true" />
+            <p className="flex-1 text-base font-semibold">{reminderNotice}</p>
+            <button type="button" className="btn-ghost !min-h-10 !px-2" aria-label="Fechar aviso" onClick={() => navigate('/', { replace: true, state: null })}>
+              <X className="h-5 w-5" aria-hidden="true" />
+            </button>
+          </div>
+        )}
+
+        <EnableRemindersCard />
+
+              {missedNotice > 0 && (
           <div role="alert" className="mb-4 flex items-start gap-2 rounded-xl border-2 border-red-600 bg-red-50 p-3 text-red-950">
             <p className="flex-1 text-base font-semibold">
               Você deixou passar {missedNotice} {missedNotice === 1 ? 'dose' : 'doses'} desde a última vez. Veja abaixo e registre o que aconteceu.

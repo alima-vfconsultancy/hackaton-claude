@@ -55,3 +55,18 @@ export const AI_CHECK_STATUS_MESSAGES = {
   no_allergies: 'Cadastre suas alergias em Ajustes para usar esta verificação.',
   unavailable: 'A verificação por IA não está ativada neste app.',
 } as const;
+
+/** Result of asking the browser for permission to show reminders. */
+export const NOTIFICATION_PERMISSION_MESSAGES = {
+  granted: 'Avisos ativados. O celular vai avisar na hora de cada remédio.',
+  denied:
+    'Os avisos foram bloqueados. Para ativar, abra as configurações do navegador, permita notificações para este app e tente de novo.',
+  unsupported: 'Este navegador não permite avisos. Use "Adicionar lembretes ao calendário" em cada remédio.',
+  default: 'Os avisos não foram ativados. Toque de novo e escolha "Permitir".',
+} as const;
+
+/** Shown on Hoje when a "Tomei"/"Adiar" tap on a notification could not be applied. */
+export const REMINDER_ACTION_MESSAGES = {
+  notOpen: 'Esta dose já tinha sido registrada ou passou do horário, por isso nada mudou. Confira a lista abaixo.',
+  failed: 'Não consegui registrar a dose pelo aviso. Toque em "Tomei" ou "Adiar" na lista abaixo.',
+} as const;

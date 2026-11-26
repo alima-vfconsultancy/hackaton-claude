@@ -114,6 +114,10 @@ export function createInMemoryPorts(initial: Partial<InMemoryStore> = {}): Stora
 export interface RecordingNotifier extends ReminderNotifier {
   shown: Array<{ doseId: string; medicationId: string }>;
   alerts: number;
+  /** Ids of the doses whose notification was closed. */
+  dismissed: string[];
+  /** Every due-dose count shown on the tab/app icon. */
+  pendingCounts: number[];
 }
 
 /** Notifier that records what it was asked to show instead of showing it. */
@@ -121,6 +125,14 @@ export function createRecordingNotifier(): RecordingNotifier {
   const notifier: RecordingNotifier = {
     shown: [],
     alerts: 0,
+    dismissed: [],
+    pendingCounts: [],
+    showPendingCount: (count) => {
+      notifier.pendingCounts.push(count);
+    },
+    dismissDoseReminder: async (doseId) => {
+      notifier.dismissed.push(doseId);
+    },
     isSupported: () => true,
     getPermission: () => 'granted',
     requestPermission: async () => 'granted',

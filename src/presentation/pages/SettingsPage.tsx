@@ -1,11 +1,12 @@
 import { useState } from 'react';
 import { Link } from 'react-router-dom';
-import { Bell, FileDown, Smartphone, Type } from 'lucide-react';
-import type { NotificationPermissionState } from '../../application/ports';
+import { Bell, BellOff, FileDown, Smartphone, Type } from 'lucide-react';
 import { app } from '../../composition-root';
 import type { FontScale } from '../../domain/settings';
 import { PageHeader } from '../components/PageHeader';
+import { useNotificationSettings } from '../hooks/useNotificationSettings';
 import { useSettings } from '../hooks/useSettings';
+import { NOTIFICATION_PERMISSION_MESSAGES } from '../i18n/messages';
 
 const FONT_SCALE_OPTIONS: Array<[FontScale, string]> = [['normal', 'Normal'], ['large', 'Grande']];
 const SNOOZE_OPTIONS_MINUTES = [5, 10, 15, 30, 60];
@@ -15,19 +16,17 @@ type Feedback = { kind: 'ok' | 'error'; text: string };
 /** Notifications, PDF export, font size and install help. */
 export default function SettingsPage() {
   const settings = useSettings();
-  const [permission, setPermission] = useState<NotificationPermissionState>(app.notifier.getPermission());
+  const notifications = useNotificationSettings();
   const [feedback, setFeedback] = useState<Feedback | null>(null);
 
   const showSuccess = (text: string) => setFeedback({ kind: 'ok', text });
   const showError = (text: string) => setFeedback({ kind: 'error', text });
 
   async function toggleNotifications() {
-    if (settings.notificationsEnabled) { await app.settings.save({ notificationsEnabled: false }); return; }
-    const result = await app.notifier.requestPermission();
-    setPermission(result);
-    if (result === 'granted') { await app.settings.save({ notificationsEnabled: true }); showSuccess('Notificações ativadas.'); }
-    else if (result === 'unsupported') showError('Este navegador não permite notificações. Use também a opção "Adicionar lembretes ao calendário" em cada remédio.');
-    else showError('As notificações foram bloqueadas. Para ativar, abra as configurações do navegador, permita notificações para este app e tente de novo.');
+    if (notifications.status === 'on') { await notifications.disable(); setFeedback(null); return; }
+    const result = await notifications.enable();
+    if (result === 'granted') showSuccess(NOTIFICATION_PERMISSION_MESSAGES.granted);
+    else showError(NOTIFICATION_PERMISSION_MESSAGES[result]);
   }
 
   return (
@@ -47,13 +46,18 @@ export default function SettingsPage() {
             Para avisar você na hora de tomar o remédio, o app precisa da sua permissão para mostrar avisos. Os avisos aparecem enquanto o app está aberto ou foi usado há pouco.
             Para lembretes garantidos com o app fechado, use "Adicionar lembretes ao calendário" dentro de cada remédio.
           </p>
-          {!app.notifier.isSupported() && <p className="mt-2 text-base font-semibold">Este navegador não oferece notificações.</p>}
-          <button type="button" role="switch" aria-checked={settings.notificationsEnabled}
-            className={settings.notificationsEnabled ? 'btn-ghost mt-3 w-full' : 'btn-primary mt-3 w-full'}
-            onClick={toggleNotifications} disabled={!app.notifier.isSupported()}>
-            {settings.notificationsEnabled ? 'Desativar notificações' : 'Ativar notificações'}
+          {notifications.status === 'unsupported' && <p className="mt-2 text-base font-semibold">Este navegador não oferece notificações.</p>}
+          <button type="button" role="switch" aria-checked={notifications.status === 'on'}
+            className={notifications.status === 'on' ? 'btn-ghost mt-3 w-full' : 'btn-primary mt-3 w-full'}
+            onClick={toggleNotifications} disabled={notifications.status === 'unsupported'}>
+            {notifications.status === 'on' ? 'Desativar notificações' : 'Ativar notificações'}
           </button>
-          {permission === 'denied' && <p className="mt-2 text-sm font-semibold text-red-900">As notificações estão bloqueadas no navegador.</p>}
+          {notifications.status === 'blocked' && (
+            <p className="mt-2 flex items-start gap-2 text-base font-semibold text-red-900">
+              <BellOff className="mt-0.5 h-5 w-5 shrink-0" aria-hidden="true" />
+              <span>Notificações desativadas: estão bloqueadas no navegador. Para liberar, abra as configurações do navegador, permita notificações para este app e toque em "Ativar notificações".</span>
+            </p>
+          )}
           <div className="mt-4">
             <label htmlFor="snooze-minutes" className="field-label">Adiar por quantos minutos?</label>
             <select id="snooze-minutes" className="field" value={settings.snoozeMinutes}

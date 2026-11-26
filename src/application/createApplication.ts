@@ -36,11 +36,12 @@ export interface Application {
 export function createApplication(ports: ApplicationPorts): Application {
   const syncDoses = createSyncDoses(ports);
   const medications = createMedicationService(ports, syncDoses);
+  const doses = createDoseService(ports, syncDoses, ports.notifier);
   return {
     medications,
-    doses: createDoseService(ports, syncDoses),
+    doses,
     syncDoses,
-    reminders: createReminderService(ports, ports.notifier, syncDoses),
+    reminders: createReminderService(ports, ports.notifier, syncDoses, doses),
     settings: createSettingsService(ports.settings),
     allergies: createAllergyService(ports, ports.allergyAnalyzer),
     backup: createBackupService(ports),
