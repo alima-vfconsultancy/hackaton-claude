@@ -7,12 +7,12 @@ import { AppDatabase, SETTINGS_KEY } from './database';
  * @param database - database to use; defaults to the app database
  */
 export function createDexieStoragePorts(database: AppDatabase = new AppDatabase()): StoragePorts {
-  const { medications, doseLogs, settings, photos } = database;
+  const { medications, doseLogs, settings, photos, allergies } = database;
 
   return {
     transactions: {
       // Every repository call made inside `work` joins the same transaction.
-      run: (work) => database.transaction('rw', [medications, doseLogs, settings, photos], work),
+      run: (work) => database.transaction('rw', [medications, doseLogs, settings, photos, allergies], work),
     },
 
     ids: { next: () => crypto.randomUUID() },
@@ -56,6 +56,14 @@ export function createDexieStoragePorts(database: AppDatabase = new AppDatabase(
       addMany: async (items) => void (await photos.bulkAdd(items)),
       remove: (id) => photos.delete(id),
       clear: () => photos.clear(),
+    },
+
+    allergies: {
+      listAll: () => allergies.toArray(),
+      add: async (allergy) => void (await allergies.add(allergy)),
+      addMany: async (items) => void (await allergies.bulkAdd(items)),
+      remove: (id) => allergies.delete(id),
+      clear: () => allergies.clear(),
     },
   };
 }

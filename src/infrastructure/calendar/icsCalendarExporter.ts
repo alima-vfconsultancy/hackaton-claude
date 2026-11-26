@@ -3,6 +3,7 @@ import type { CalendarExporter, FileDownloader } from '../../application/ports';
 import type { Medication } from '../../domain/medication';
 import { intervalDividesDay, treatmentEnd } from '../../domain/schedule';
 import { HOUR_MS, MINUTE_MS, parseLocalDate, withLocalTime } from '../../domain/time';
+import { APP_NAME } from '../../shared/brand';
 import { describeMedication } from '../../shared/ptBR/format';
 
 export type IcsMedication = Pick<Medication, 'id' | 'name' | 'dosage' | 'instructions' | 'schedule' | 'period'>;
@@ -65,11 +66,12 @@ function buildSeries(medication: IcsMedication): EventSeries[] {
  */
 export function buildIcs(medication: IcsMedication, now = new Date()): string {
   const title = `Tomar ${describeMedication(medication)}`;
-  const description = [medication.instructions, 'Lembrete criado pelo MeuRemédio. Confira sempre os dados com a receita.']
+  const description = [medication.instructions, `Lembrete criado pelo ${APP_NAME}. Confira sempre os dados com a receita.`]
     .filter(Boolean)
     .join(' - ');
+  // PRODID and the event UIDs keep the old internal id, so re-imported reminders replace instead of duplicating.
   const lines = [
-    'BEGIN:VCALENDAR', 'VERSION:2.0', 'PRODID:-//MeuRemedio//PT-BR//', 'CALSCALE:GREGORIAN', 'METHOD:PUBLISH', 'X-WR-CALNAME:MeuRemédio',
+    'BEGIN:VCALENDAR', 'VERSION:2.0', 'PRODID:-//MeuRemedio//PT-BR//', 'CALSCALE:GREGORIAN', 'METHOD:PUBLISH', `X-WR-CALNAME:${APP_NAME}`,
   ];
   buildSeries(medication).forEach((series, index) => {
     lines.push(
