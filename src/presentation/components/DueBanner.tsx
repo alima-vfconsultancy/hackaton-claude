@@ -12,7 +12,7 @@ export function DueBanner({ due }: { due: DueDose[] }) {
     <Link
       to="/"
       role="alert"
-      className="mb-4 flex items-center gap-3 rounded-xl border-2 border-amber-700 bg-amber-100 p-3 text-amber-950"
+      className="mb-4 flex items-center gap-3 rounded-xl border-2 border-accent-600 bg-accent-100 p-3 text-ink"
     >
       <BellRing className="h-7 w-7 shrink-0" aria-hidden="true" />
       <span className="text-base font-bold">

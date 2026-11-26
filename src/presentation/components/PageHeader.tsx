@@ -16,7 +16,7 @@ export function PageHeader({ title, back, children }: { title: string; back?: bo
           <ArrowLeft className="h-6 w-6" aria-hidden="true" />
         </button>
       )}
-      <h1 className="flex-1 text-2xl font-bold">{title}</h1>
+      <h1 className="flex-1 text-2xl">{title}</h1>
       {children}
     </header>
   );

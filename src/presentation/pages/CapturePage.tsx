@@ -58,7 +58,7 @@ export default function CapturePage() {
           <div className="mt-3 h-4 w-full overflow-hidden rounded-full bg-slate-200" aria-hidden="true">
             <div className="h-full bg-brand-700" style={{ width: `${progress?.stage === 'reading' ? progress.percent : 5}%` }} />
           </div>
-          <p className="mt-2 text-sm text-slate-700">Isso é feito no seu aparelho. Nada é enviado para a internet.</p>
+          <p className="mt-2 text-sm text-muted">Isso é feito no seu aparelho. Nada é enviado para a internet.</p>
           <button type="button" className="btn-ghost mt-4 w-full" onClick={cancel}>Cancelar</button>
         </div>
       ) : (
@@ -87,7 +87,7 @@ export default function CapturePage() {
           )}
 
           <div className="card mt-4 flex gap-3">
-            <Lightbulb className="mt-1 h-6 w-6 shrink-0 text-amber-700" aria-hidden="true" />
+            <Lightbulb className="mt-1 h-6 w-6 shrink-0 text-ink" aria-hidden="true" />
             <div className="text-base">
               <p className="font-bold">Dicas para uma boa leitura</p>
               <ul className="mt-1 list-disc pl-5">

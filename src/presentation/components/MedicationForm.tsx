@@ -38,7 +38,7 @@ export function MedicationForm({
   const set = (patch: Partial<MedicationFormValues>) => onChange({ ...value, ...patch });
   const warn = (isUncertain?: boolean) => (isUncertain ? 'field-warn' : '');
   const hint = (isUncertain?: boolean) =>
-    isUncertain ? <p className="mt-1 text-sm font-semibold text-amber-900">⚠ Leitura incerta. Confira com a receita.</p> : null;
+    isUncertain ? <p className="mt-1 text-sm font-semibold text-ink">⚠ Leitura incerta. Confira com a receita.</p> : null;
   // Empty required field that was not read from the prescription (or the user already tried to save). Goes away once filled.
   const emptyFields = findEmptyRequiredFields(value);
   const isMissing = (field: RequiredField) => !!emptyFields[field] && (!!unread[field] || isSubmitted);
@@ -52,7 +52,7 @@ export function MedicationForm({
       </p>
     ) : null;
   const groupStatus = (field: RequiredField, isUncertain?: boolean) =>
-    isMissing(field) ? 'border-red-700 bg-red-50' : isUncertain ? 'border-amber-600 bg-amber-50' : 'border-slate-300';
+    isMissing(field) ? 'border-red-700 bg-red-50' : isUncertain ? 'border-accent-600 bg-accent-100' : 'border-slate-300';
   const schedulePreview = describeSchedulePreview(buildMedicationDraft(value).draft.schedule);
   const unitOptions = [...new Set([...DOSAGE_UNITS, value.dosageUnit])];
 
@@ -102,7 +102,7 @@ export function MedicationForm({
           {SCHEDULE_OPTIONS.map(([type, label]) => (
             <button key={type} type="button" role="radio" aria-checked={value.scheduleType === type}
               onClick={() => set({ scheduleType: type })}
-              className={`btn ${value.scheduleType === type ? 'bg-brand-700 text-white' : 'border-2 border-slate-400 bg-white text-slate-900'}`}>
+              className={`btn ${value.scheduleType === type ? 'bg-brand-700 text-white' : 'border-2 border-slate-400 bg-white text-ink'}`}>
               {label}
             </button>
           ))}
@@ -146,7 +146,7 @@ export function MedicationForm({
         )}
         {isMissing('schedule') ? missingHint('schedule') : hint(flags.schedule)}
         {schedulePreview && (
-          <p className="mt-3 rounded-lg bg-brand-50 p-3 text-base font-semibold text-brand-800" aria-live="polite">
+          <p className="mt-3 rounded-lg bg-mint p-3 text-base font-semibold text-brand-700" aria-live="polite">
             {schedulePreview}
           </p>
         )}

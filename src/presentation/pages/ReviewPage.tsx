@@ -146,7 +146,7 @@ export default function ReviewPage() {
         {items.map((item, index) => (
           <section key={item.key} className="card" aria-label={`Remédio ${index + 1}`}>
             <div className="mb-3 flex items-center justify-between">
-              <h2 className="text-xl font-bold">Remédio {index + 1}</h2>
+              <h2 className="text-xl">Remédio {index + 1}</h2>
               <button type="button" className="btn-ghost !min-h-10 text-red-800"
                 onClick={() => setItems((list) => list.filter((other) => other.key !== item.key))}>
                 <Trash2 className="h-5 w-5" aria-hidden="true" /> Remover
@@ -173,7 +173,7 @@ export default function ReviewPage() {
           Guardar foto da receita
         </label>
       )}
-      {keepPhoto && <p className="text-sm text-slate-700">Será guardada uma miniatura pequena, só neste aparelho.</p>}
+      {keepPhoto && <p className="text-sm text-muted">Será guardada uma miniatura pequena, só neste aparelho.</p>}
 
       <button type="button" disabled={isSaving} className="btn-primary mt-6 w-full !min-h-14 text-lg" onClick={confirm}>
         <CheckCheck className="h-6 w-6" aria-hidden="true" /> Confirmar e criar lembretes

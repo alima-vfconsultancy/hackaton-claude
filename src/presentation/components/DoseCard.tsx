@@ -20,14 +20,14 @@ export function DoseCard({
   const isActionable = isOpen(dose) || dose.status === 'missed';
   return (
     <li
-      className={`card ${highlight ? 'border-2 border-brand-700 ring-2 ring-brand-100' : ''}`}
+      className={`card ${highlight ? 'border-2 border-brand-700 ring-2 ring-brand-200' : ''}`}
       aria-label={`${medication.name}, ${formatTime(effectiveTime(dose))}`}
     >
       <div className="flex items-start justify-between gap-3">
         <div className="min-w-0">
-          {highlight && <p className="mb-1 text-sm font-bold uppercase tracking-wide text-brand-800">Próxima dose</p>}
+          {highlight && <p className="mb-1 text-sm font-bold uppercase tracking-wide text-brand-700">Próxima dose</p>}
           <h3 className="break-words text-xl font-bold">{medication.name}</h3>
-          <p className="text-base text-slate-800">
+          <p className="text-base text-ink">
             {formatDosage(medication.dosage) || 'Dosagem não informada'}
             {medication.instructions ? ` · ${medication.instructions}` : ''}
           </p>

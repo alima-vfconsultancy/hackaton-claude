@@ -12,16 +12,16 @@ export default defineConfig(({ mode }) => ({
       registerType: 'autoUpdate',
       includeAssets: ['icons/*.png', 'icons/*.svg'],
       manifest: {
-        name: 'MeuRemédio',
-        short_name: 'MeuRemédio',
-        description: 'Organize seus medicamentos e lembretes de doses.',
+        name: 'Dose Certa',
+        short_name: 'Dose Certa',
+        description: 'Seu remédio na hora certa. Organize seus medicamentos e lembretes de doses.',
         lang: 'pt-BR',
         start_url: '/',
         scope: '/',
         display: 'standalone',
         orientation: 'portrait',
-        background_color: '#ffffff',
-        theme_color: '#1d4ed8',
+        background_color: '#F7FBFA',
+        theme_color: '#0B5F6B',
         icons: [
           { src: 'icons/icon-192.png', sizes: '192x192', type: 'image/png' },
           { src: 'icons/icon-512.png', sizes: '512x512', type: 'image/png' },
@@ -29,7 +29,8 @@ export default defineConfig(({ mode }) => ({
         ],
       },
       workbox: {
-        globPatterns: ['**/*.{js,css,html,png,svg,ico,webmanifest}'],
+        // woff2: the bundled brand fonts (Nunito, Inter) must work offline.
+        globPatterns: ['**/*.{woff2,js,css,html,png,svg,ico,webmanifest}'],
         maximumFileSizeToCacheInBytes: 12 * 1024 * 1024,
         navigateFallback: '/index.html',
         importScripts: ['sw-notifications.js'],

@@ -33,7 +33,7 @@ export default function HistoryPage() {
       <div role="tablist" aria-label="Tipo de tratamento" className="mb-4 grid grid-cols-2 gap-2">
         {TABS.map(([key, label]) => (
           <button key={key} role="tab" aria-selected={tab === key} type="button" onClick={() => setTab(key)}
-            className={`btn ${tab === key ? 'bg-brand-700 text-white' : 'border-2 border-slate-400 bg-white text-slate-900'}`}>
+            className={`btn ${tab === key ? 'bg-brand-700 text-white' : 'border-2 border-slate-400 bg-white text-ink'}`}>
             {label}
           </button>
         ))}
@@ -43,12 +43,12 @@ export default function HistoryPage() {
         <div>
           <label htmlFor="history-search" className="field-label">Buscar pelo nome</label>
           <div className="relative">
-            <Search className="pointer-events-none absolute left-3 top-1/2 h-5 w-5 -translate-y-1/2 text-slate-600" aria-hidden="true" />
+            <Search className="pointer-events-none absolute left-3 top-1/2 h-5 w-5 -translate-y-1/2 text-muted" aria-hidden="true" />
             <input id="history-search" type="search" className="field !pl-10" value={search}
               onChange={(event) => setSearch(event.target.value)} placeholder="Ex.: Amoxicilina" />
           </div>
         </div>
-        <div className="grid grid-cols-2 gap-3">
+        <div className="grid gap-3">
           <div>
             <label htmlFor="history-from" className="field-label">De</label>
             <input id="history-from" type="date" className="field" value={from} onChange={(event) => setFrom(event.target.value)} />
@@ -73,11 +73,11 @@ export default function HistoryPage() {
         <ul className="space-y-3">
           {visible.map((medication) => (
             <li key={medication.id}>
-              <Link to={`/historico/${medication.id}`} className="card flex items-center gap-3 hover:bg-slate-50">
+              <Link to={`/historico/${medication.id}`} className="card flex items-center gap-3 hover:bg-mist">
                 <div className="min-w-0 flex-1">
                   <p className="break-words text-xl font-bold">{medication.name}</p>
                   <p className="text-base">{formatDosage(medication.dosage)} · {describeFrequency(medication.schedule)}</p>
-                  <p className="text-sm text-slate-700">{describePeriod(medication.period)}</p>
+                  <p className="text-sm text-muted">{describePeriod(medication.period)}</p>
                   <p className="mt-1 text-sm font-semibold">{TREATMENT_STATUS_LABELS[medication.status]}</p>
                 </div>
                 <ChevronRight className="h-6 w-6 shrink-0" aria-hidden="true" />
