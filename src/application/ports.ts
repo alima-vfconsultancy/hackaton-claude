@@ -138,6 +138,8 @@ export interface ReminderNotifier {
   requestPermission(): Promise<NotificationPermissionState>;
   /** Returns whether a notification was actually shown. */
   showDoseReminder(dose: DoseLog, medication: Medication): Promise<boolean>;
+  /** Shows how many doses are due now (tab title and app icon badge), like a chat app; 0 clears it. Fails silently. */
+  showPendingCount(count: number): void;
   /** Closes the notification of a dose that was already registered; fails silently. */
   dismissDoseReminder(doseId: string): Promise<void>;
   /** Short beep and vibration while the app is open; fails silently. */

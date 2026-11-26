@@ -34,12 +34,18 @@ export function useNotificationActions(): void {
       void apply(link.doseId, link.action);
     }
 
-    if (!('serviceWorker' in navigator)) return;
     const onMessage = (event: MessageEvent) => {
       const click = parseReminderMessage(event.data);
       if (click) void apply(click.doseId, click.action);
     };
-    navigator.serviceWorker.addEventListener('message', onMessage);
-    return () => navigator.serviceWorker.removeEventListener('message', onMessage);
+    // Popups shown by the page itself (no active service worker) post to the window: same origin only.
+    const onWindowMessage = (event: MessageEvent) => event.origin === window.location.origin && onMessage(event);
+    window.addEventListener('message', onWindowMessage);
+    const serviceWorker = 'serviceWorker' in navigator ? navigator.serviceWorker : undefined;
+    serviceWorker?.addEventListener('message', onMessage);
+    return () => {
+      window.removeEventListener('message', onWindowMessage);
+      serviceWorker?.removeEventListener('message', onMessage);
+    };
   }, [navigate, search]);
 }

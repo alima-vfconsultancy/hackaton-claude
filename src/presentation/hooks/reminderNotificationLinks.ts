@@ -1,13 +1,11 @@
 import type { NotificationPermissionState } from '../../application/ports';
-import type { ReminderAction } from '../../application/reminderService';
+import { REMINDER_CLICK_MESSAGE, type ReminderAction } from '../../application/reminderService';
 
-/**
+/*
  * Contract with `public/sw-notifications.js` (plain JS, it cannot import this file):
  * - app closed: the service worker opens `/?lembrete=<doseId>&acao=tomar|adiar`;
- * - app open: it sends `{ type: 'reminder-click', doseId, action: 'take' | 'snooze' | '' }`
- *   ('' = the user tapped the notification itself, not a button).
+ * - app open: it (or a page popup) sends a `REMINDER_CLICK_MESSAGE` to the window.
  */
-export const REMINDER_MESSAGE_TYPE = 'reminder-click';
 
 /** URL values are user-facing, so they stay in Portuguese. */
 const ACTION_BY_PARAM: Record<string, ReminderAction> = { tomar: 'take', adiar: 'snooze' };
@@ -40,7 +38,7 @@ export function parseReminderLink(search: string): { doseId: string; action: Rem
 export function parseReminderMessage(data: unknown): ReminderClick | null {
   if (typeof data !== 'object' || data === null) return null;
   const { type, doseId, action } = data as Record<string, unknown>;
-  if (type !== REMINDER_MESSAGE_TYPE || typeof doseId !== 'string' || !doseId) return null;
+  if (type !== REMINDER_CLICK_MESSAGE || typeof doseId !== 'string' || !doseId) return null;
   return { doseId, action: action === 'take' || action === 'snooze' ? action : null };
 }
 

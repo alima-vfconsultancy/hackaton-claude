@@ -160,6 +160,9 @@ separadamente e é tão vinculante quanto este arquivo:
   abre a tela Hoje. Registrar/adiar uma dose fecha o aviso dela (`ReminderNotifier.dismissDoseReminder`).
   O estado mostrado combina a configuração com a permissão do navegador (`getNotificationStatus`): permissão
   bloqueada aparece como desativada. Sem servidor de push: com o app fechado há muito tempo, o lembrete garantido é o `.ics`.
+  Sem service worker ativo (`npm run dev`, 1ª visita) o aviso sai direto da página (`new Notification`, estilo WhatsApp
+  Web, sem botões; o clique foca a aba e abre Hoje via `window.postMessage`). Nunca esperar `serviceWorker.ready`
+  (não resolve sem SW). O título da aba mostra "(N) Dose Certa" e o ícone do app instalado ganha o número (Badging API).
 - **Lembretes garantidos**: arquivo `.ics` com horário "flutuante" (sem fuso; usa o do celular).
   Intervalos que dividem 24h viram eventos diários (um por horário); os demais usam `FREQ=HOURLY`.
 - **"Nx ao dia"** no parser vira horários fixos sugeridos (1x 08:00; 2x 08:00/20:00; 3x 08:00/14:00/20:00;

@@ -10,6 +10,13 @@ export type DueDose = DoseEntry;
 /** Buttons on the reminder notification: "Tomei" and "Adiar". */
 export type ReminderAction = 'take' | 'snooze';
 
+/**
+ * Type of the message a notification click sends to the app window:
+ * `{ type, doseId, action: 'take' | 'snooze' | '' }` ('' = the notification itself was tapped).
+ * Also hard-coded in `public/sw-notifications.js`, which cannot import modules.
+ */
+export const REMINDER_CLICK_MESSAGE = 'reminder-click';
+
 export interface ReminderService {
   /**
    * Refreshes the doses, returns the ones due right now and alerts once per dose
@@ -49,6 +56,7 @@ export function createReminderService(
         })
         .sort((a, b) => effectiveTime(a) - effectiveTime(b))
         .map((dose) => ({ dose, medication: byId.get(dose.medicationId)! }));
+      notifier.showPendingCount(due.length);
 
       const fresh = due.filter(({ dose }) => !dose.notifiedAt);
       if (fresh.length) notifier.playAlert();

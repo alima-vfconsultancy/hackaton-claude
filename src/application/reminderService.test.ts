@@ -37,6 +37,18 @@ describe('reminders.check', () => {
     expect(ports.store.doses[0].notifiedAt).toBe(NOW);
   });
 
+  it('reports how many doses are due, for the counter on the tab and app icon', async () => {
+    const { notifier, service } = setup([
+      buildDose({ id: 'a', scheduledAt: NOW - 5 * MINUTE }),
+      buildDose({ id: 'b', scheduledAt: NOW - 1 * MINUTE }),
+      buildDose({ id: 'future', scheduledAt: NOW + 10 * MINUTE }),
+    ]);
+
+    await service.check({ notificationsEnabled: false });
+
+    expect(notifier.pendingCounts).toEqual([2]);
+  });
+
   it('beeps but shows no system notification when notifications are disabled', async () => {
     const { notifier, service } = setup();
 
