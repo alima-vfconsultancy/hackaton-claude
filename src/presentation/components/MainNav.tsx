@@ -23,7 +23,7 @@ export function MainNav() {
               end={end}
               className={({ isActive }) =>
                 // Labels stay at the 18px brand minimum even with the large font, so the 5 items fit in 360px.
-                `flex min-h-16 flex-col items-center justify-center gap-0.5 px-0.5 text-[18px] font-semibold leading-tight lg:min-h-12 lg:flex-row lg:justify-start lg:gap-3 lg:rounded-xl lg:px-4 lg:text-base ${
+                `flex min-h-16 flex-col items-center justify-center gap-0.5 px-0 text-[18px] font-semibold leading-tight lg:min-h-12 lg:flex-row lg:justify-start lg:gap-3 lg:rounded-xl lg:px-4 lg:text-base ${
                   isActive ? 'bg-mint text-brand-700' : 'text-muted lg:hover:bg-mist'
                 }`
               }

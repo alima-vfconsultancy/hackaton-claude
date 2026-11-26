@@ -1,4 +1,4 @@
-import { CalendarDays, FileDown, History, House, Settings, type LucideIcon } from 'lucide-react';
+import { CalendarDays, History, House, Settings, ShieldAlert, type LucideIcon } from 'lucide-react';
 
 /** One entry of the main navigation (bottom bar on small screens, side bar on desktop). */
 export interface NavigationItem {
@@ -9,12 +9,13 @@ export interface NavigationItem {
   end: boolean;
 }
 
-// Route paths are part of the user-facing URL, so they stay in Portuguese.
+// Route paths are part of the user-facing URL, so they stay in Portuguese. At most five items with short labels:
+// at 18px each label must fit in ~70px on a 360px screen (hence "Agenda" and "Registro"; the page titles stay full).
 export const NAVIGATION_ITEMS: readonly NavigationItem[] = [
   { to: '/', label: 'Hoje', Icon: House, end: true },
-  { to: '/calendario', label: 'Calendário', Icon: CalendarDays, end: false },
-  { to: '/historico', label: 'Histórico', Icon: History, end: false },
-  { to: '/exportar', label: 'Exportar', Icon: FileDown, end: false },
+  { to: '/calendario', label: 'Agenda', Icon: CalendarDays, end: false },
+  { to: '/historico', label: 'Registro', Icon: History, end: false },
+  { to: '/alergias', label: 'Alergias', Icon: ShieldAlert, end: false },
   { to: '/configuracoes', label: 'Ajustes', Icon: Settings, end: false },
 ];
 

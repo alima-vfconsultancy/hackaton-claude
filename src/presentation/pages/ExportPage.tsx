@@ -66,7 +66,7 @@ export default function ExportPage() {
 
   return (
     <div className="mx-auto max-w-2xl">
-      <PageHeader title="Exportar PDF" />
+      <PageHeader title="Exportar PDF" back="/configuracoes" />
       <p className="mb-4 text-base">Gere um PDF do seu histórico para imprimir ou mostrar ao médico.</p>
 
       <div className="card space-y-4">

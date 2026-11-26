@@ -108,7 +108,7 @@ Referência visual: logo principal, versões, ícone do app e cores e tipografia
 - Alvos de toque ≥ 48px (`min-h-12`), contraste WCAG AA, `label` em todo campo, foco visível (`focus-visible:ring`).
 - Status sempre com cor **e** ícone **e** texto.
 - Linguagem simples; mensagens de erro dizem o que fazer. Sem animações desnecessárias.
-- Navegação principal com 5 itens: Hoje, Calendário, Histórico, Exportar, Ajustes. Barra inferior no mobile/tablet; barra lateral fixa a partir de `lg` (ver "Layout responsivo").
+- Navegação principal com 5 itens (máximo, para caber legível em 360px): Hoje, Agenda, Registro, Alergias, Ajustes. Barra inferior no mobile/tablet; barra lateral fixa a partir de `lg` (ver "Layout responsivo").
 
 ## Processo, arquitetura e governança
 
@@ -174,13 +174,18 @@ separadamente e é tão vinculante quanto este arquivo:
   `rng`→`mg`, `cornprimido`→`comprimido` antes do parser (nunca mexe no nome do remédio).
 - **Fotos**: tabela `photos` separada; `Medication.photoId` aponta para a miniatura (uma receita pode ter vários remédios).
 - **Configurações** ficam no Dexie (tabela `settings`, linha de chave `app`, detalhe só do adaptador). `localStorage` não é usado.
-- **Tela Ajustes da POC**: só Notificações, Tamanho da letra e Instalar na tela inicial. Backup (exportar/importar
+- **Tela Ajustes da POC**: só Notificações, Exportar PDF (botão que abre `/exportar`; voltar leva a Ajustes),
+  Tamanho da letra e Instalar na tela inicial. O cadastro de alergias saiu daqui e virou a aba Alergias. Backup (exportar/importar
   JSON), Demonstração ("Carregar exemplo") e "Apagar todos os dados" foram tirados da tela; por ser POC, o usuário
   não tem como salvar ou recuperar os dados. Os serviços `app.backup` (inclui `wipeAll`) e `app.sampleData`, o
   `SAMPLE_DATA_ENABLED` (`composition-root.ts`) e as mensagens de `BackupError` continuam no código, sem uso na
   interface. `SettingsPage.test.ts` garante que as opções não voltem por engano.
 - Ícones via `lucide-react` (simples e tree-shakeable).
 - **Navegação**: o último item se chama "Ajustes" (rota `/configuracoes`) porque "Configurações" não cabe em 360px.
+  Alergias tem aba própria (`/alergias`) por ser um item de segurança que precisa de visibilidade; para caber, Exportar
+  saiu da barra e foi para Ajustes. Com 5 itens, cada rótulo tem ~72 px a 18 px: por isso a barra usa "Agenda"
+  (`/calendario`) e "Registro" (`/historico`) em vez de "Calendário" e "Histórico", que transbordavam, e os links não
+  têm padding lateral. Os títulos das telas continuam "Calendário" e "Histórico". `navigationItems.test.ts` fixa os itens e o limite de 5.
   `presentation/components/navigationItems.ts` guarda os itens e `shouldShowNavigation` (esconde a navegação em `/fotografar` e `/revisar`);
   `MainNav` é um único `<nav>` responsivo (barra inferior; barra lateral com a logo a partir de `lg`) e `AppShell` é a moldura da página.
 - **Layout responsivo** (mobile-first: as classes base são o layout de celular, `md:`/`lg:`/`xl:` só acrescentam):
@@ -192,9 +197,9 @@ separadamente e é tão vinculante quanto este arquivo:
   | `lg` (≥ 1024px) | barra lateral fixa (`w-60`), conteúdo em `max-w-5xl`; Hoje com doses + coluna de ações (`15rem`) |
   | `xl` (≥ 1280px) | Calendário, Detalhe e Ajustes em 2 colunas; coluna de ações da Hoje com `20rem` |
 
-  Formulários e fluxos lineares (Exportar, Fotografar, Revisar, Editar) ficam limitados a `max-w-2xl`/`max-w-3xl`.
+  Formulários e fluxos lineares (Exportar, Alergias, Fotografar, Revisar, Editar) ficam limitados a `max-w-2xl`/`max-w-3xl`.
   Larguras em `rem` (respeitam a letra grande); alvos de toque continuam ≥ 48px. O `manifest` não trava a orientação
   (tablet/desktop). O CSS responsivo não é testável no Vitest (ambiente `node`); confira em 360, 768, 1024 e 1440px.
-- **Rotas** (URLs voltadas ao usuário, por isso em português): `/`, `/fotografar`, `/revisar`, `/medicamento/novo`, `/medicamento/:id/editar`, `/historico`, `/historico/:id`, `/exportar`, `/configuracoes`.
+- **Rotas** (URLs voltadas ao usuário, por isso em português): `/`, `/calendario`, `/fotografar`, `/revisar`, `/medicamento/novo`, `/medicamento/:id/editar`, `/historico`, `/historico/:id`, `/alergias`, `/exportar`, `/configuracoes`.
 - **Code splitting**: jsPDF e Tesseract são carregados sob demanda (`import()` dentro dos adaptadores de `infrastructure`).
 - **Versões**: majors estáveis — Vite 6, Tailwind 3, React Router 6, TypeScript 5.9.
