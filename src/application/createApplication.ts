@@ -1,4 +1,5 @@
 import { createAgendaService, type AgendaService } from './agendaService';
+import { createAllergyService, type AllergyService } from './allergyService';
 import { createBackupService, type BackupService } from './backup';
 import { createDoseService, type DoseService } from './doseService';
 import { createMedicationService, type MedicationService } from './medicationService';
@@ -17,6 +18,7 @@ export interface Application {
   syncDoses: SyncDoses;
   reminders: ReminderService;
   settings: SettingsService;
+  allergies: AllergyService;
   backup: BackupService;
   reports: ReportService;
   sampleData: SampleDataService;
@@ -40,6 +42,7 @@ export function createApplication(ports: ApplicationPorts): Application {
     syncDoses,
     reminders: createReminderService(ports, ports.notifier, syncDoses),
     settings: createSettingsService(ports.settings),
+    allergies: createAllergyService(ports, ports.allergyAnalyzer),
     backup: createBackupService(ports),
     reports: createReportService(ports, ports.pdf),
     sampleData: createSampleDataService(medications),

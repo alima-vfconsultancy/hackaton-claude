@@ -1,4 +1,5 @@
 import { createApplication } from './application/createApplication';
+import { createHttpAllergyAnalyzer } from './infrastructure/ai/httpAllergyAnalyzer';
 import { createIcsCalendarExporter } from './infrastructure/calendar/icsCalendarExporter';
 import { createBrowserFileDownloader } from './infrastructure/files/browserFileDownloader';
 import { createCanvasImageProcessor } from './infrastructure/imaging/canvasImageProcessor';
@@ -21,6 +22,8 @@ export const app = createApplication({
   calendar: createIcsCalendarExporter(files),
   notifier: createBrowserReminderNotifier(),
   files,
+  // Optional: without VITE_ALLERGY_API_URL the app only uses the local allergy check.
+  allergyAnalyzer: import.meta.env.VITE_ALLERGY_API_URL ? createHttpAllergyAnalyzer(import.meta.env.VITE_ALLERGY_API_URL) : null,
 });
 
 /** The "load sample data" button only exists in development and demo builds. */

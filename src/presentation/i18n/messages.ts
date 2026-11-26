@@ -1,5 +1,7 @@
+import type { AllergyIssueCode } from '../../domain/allergy';
 import type { BackupErrorCode } from '../../application/errors';
 import type { MedicationFormIssueCode } from '../forms/medicationFormValues';
+import type { RequiredField } from '../forms/missingRequiredFields';
 
 /** Error messages always say what to do next. */
 export const MEDICATION_ISSUE_MESSAGES: Record<MedicationFormIssueCode, string> = {
@@ -15,6 +17,27 @@ export const MEDICATION_ISSUE_MESSAGES: Record<MedicationFormIssueCode, string> 
   end_before_start: 'A data final deve ser igual ou depois da data de início.',
 };
 
+/** Shown next to a required field that is empty: `notRead` when the prescription did not provide it, `empty` otherwise. */
+export const REQUIRED_FIELD_MESSAGES: Record<RequiredField, { notRead: string; empty: string }> = {
+  name: {
+    notRead: 'Não encontrei o nome do remédio na receita. Escreva o nome.',
+    empty: 'Falta o nome do remédio. Escreva o nome.',
+  },
+  schedule: {
+    notRead: 'Não encontrei a frequência na receita. Informe de quantas em quantas horas ou os horários.',
+    empty: 'Falta informar a frequência: de quantas em quantas horas ou os horários.',
+  },
+  duration: {
+    notRead: 'Não encontrei por quanto tempo tomar. Informe os dias, a data final ou marque uso contínuo.',
+    empty: 'Falta informar por quanto tempo vai tomar. Informe os dias, a data final ou marque uso contínuo.',
+  },
+};
+
+export const ALLERGY_ISSUE_MESSAGES: Record<AllergyIssueCode, string> = {
+  substance_required: 'Escreva o nome do remédio ou da substância à qual você tem alergia.',
+  substance_duplicated: 'Esta alergia já está na sua lista.',
+};
+
 export const BACKUP_ERROR_MESSAGES: Record<BackupErrorCode, string> = {
   not_json: 'Este arquivo não é um backup válido. Escolha um arquivo .json exportado pelo MeuRemédio.',
   not_a_backup: 'Este arquivo não é um backup do MeuRemédio. Escolha o arquivo que você exportou pelo app.',
@@ -22,3 +45,13 @@ export const BACKUP_ERROR_MESSAGES: Record<BackupErrorCode, string> = {
   incomplete: 'O backup está incompleto ou danificado. Tente exportar de novo no aparelho de origem.',
   invalid_data: 'O backup contém dados inválidos. Nada foi alterado.',
 };
+
+export const AI_CHECK_CONSENT_TITLE = 'Enviar nomes para verificação por IA?';
+export const AI_CHECK_CONSENT_MESSAGE =
+  'Para verificar, o app envia pela internet apenas os nomes dos remédios desta receita e a lista das suas alergias a um serviço de inteligência artificial (Claude, da Anthropic). A foto, o texto da receita, seu nome e seus horários não são enviados. Você pode desligar isso em Ajustes.';
+
+export const AI_CHECK_STATUS_MESSAGES = {
+  failed: 'Não foi possível verificar agora. Confira sua internet e tente de novo. O aviso básico continua funcionando.',
+  no_allergies: 'Cadastre suas alergias em Ajustes para usar esta verificação.',
+  unavailable: 'A verificação por IA não está ativada neste app.',
+} as const;
