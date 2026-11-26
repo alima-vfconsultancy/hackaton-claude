@@ -7,7 +7,7 @@ import { ConfirmDialog } from './ConfirmDialog';
 
 const RISK_VIEW: Record<AllergyRisk, { label: string; Icon: typeof CircleCheck; className: string }> = {
   none: { label: 'Nenhuma relação encontrada', Icon: CircleCheck, className: 'border-green-700 bg-green-50 text-green-950' },
-  possible: { label: 'Possível relação com sua alergia', Icon: TriangleAlert, className: 'border-amber-600 bg-amber-50 text-amber-950' },
+  possible: { label: 'Possível relação com sua alergia', Icon: TriangleAlert, className: 'border-accent-600 bg-accent-100 text-ink' },
   likely: { label: 'Provável alergia', Icon: OctagonAlert, className: 'border-red-600 bg-red-50 text-red-950' },
 };
 
