@@ -1,11 +1,12 @@
 import { NavLink } from 'react-router-dom';
-import { CalendarDays, FileDown, History, House, Settings } from 'lucide-react';
+import { CalendarDays, History, House, Settings, ShieldAlert } from 'lucide-react';
 
-const items = [
+// At most five items: more than that makes the labels unreadable at 360px.
+export const NAV_ITEMS = [
   { to: '/', label: 'Hoje', Icon: House, end: true },
   { to: '/calendario', label: 'Calendário', Icon: CalendarDays, end: false },
   { to: '/historico', label: 'Histórico', Icon: History, end: false },
-  { to: '/exportar', label: 'Exportar', Icon: FileDown, end: false },
+  { to: '/alergias', label: 'Alergias', Icon: ShieldAlert, end: false },
   { to: '/configuracoes', label: 'Ajustes', Icon: Settings, end: false },
 ];
 
@@ -16,7 +17,7 @@ export function BottomNav() {
       className="fixed inset-x-0 bottom-0 z-20 border-t border-slate-300 bg-white pb-[env(safe-area-inset-bottom)]"
     >
       <ul className="mx-auto grid max-w-md grid-cols-5">
-        {items.map(({ to, label, Icon, end }) => (
+        {NAV_ITEMS.map(({ to, label, Icon, end }) => (
           <li key={to}>
             <NavLink
               to={to}

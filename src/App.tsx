@@ -5,6 +5,7 @@ import { DueBanner } from './presentation/components/DueBanner';
 import { PageHeader } from './presentation/components/PageHeader';
 import { useReminders } from './presentation/hooks/useReminders';
 import { useSettings } from './presentation/hooks/useSettings';
+import AllergiesPage from './presentation/pages/AllergiesPage';
 import CalendarPage from './presentation/pages/CalendarPage';
 import CapturePage from './presentation/pages/CapturePage';
 import ExportPage from './presentation/pages/ExportPage';
@@ -47,6 +48,7 @@ export default function App() {
           <Route path="/medicamento/:id/editar" element={<MedicationEditPage />} />
           <Route path="/historico" element={<HistoryPage />} />
           <Route path="/historico/:id" element={<MedicationDetailPage />} />
+          <Route path="/alergias" element={<AllergiesPage />} />
           <Route path="/exportar" element={<ExportPage />} />
           <Route path="/configuracoes" element={<SettingsPage />} />
           <Route path="*" element={<PageHeader title="Página não encontrada" back="/" />} />

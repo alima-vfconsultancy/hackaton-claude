@@ -1,9 +1,9 @@
 import { useState } from 'react';
-import { Bell, Smartphone, Type } from 'lucide-react';
+import { Link } from 'react-router-dom';
+import { Bell, FileDown, Smartphone, Type } from 'lucide-react';
 import type { NotificationPermissionState } from '../../application/ports';
 import { app } from '../../composition-root';
 import type { FontScale } from '../../domain/settings';
-import { AllergySection } from '../components/AllergySection';
 import { PageHeader } from '../components/PageHeader';
 import { useSettings } from '../hooks/useSettings';
 
@@ -12,7 +12,7 @@ const SNOOZE_OPTIONS_MINUTES = [5, 10, 15, 30, 60];
 
 type Feedback = { kind: 'ok' | 'error'; text: string };
 
-/** Notifications, font size and install help. */
+/** Notifications, PDF export, font size and install help. */
 export default function SettingsPage() {
   const settings = useSettings();
   const [permission, setPermission] = useState<NotificationPermissionState>(app.notifier.getPermission());
@@ -62,7 +62,13 @@ export default function SettingsPage() {
         </div>
       </section>
 
-      <AllergySection />
+      <section className="card mb-4">
+        <h2 className="flex items-center gap-2 text-xl font-bold"><FileDown className="h-6 w-6" aria-hidden="true" /> Exportar PDF</h2>
+        <p className="mt-1 text-base">Gere um PDF do seu histórico para imprimir ou mostrar ao médico.</p>
+        <Link to="/exportar" className="btn-primary mt-3 w-full">
+          <FileDown className="h-5 w-5" aria-hidden="true" /> Gerar PDF do histórico
+        </Link>
+      </section>
 
       <section className="card mb-4">
         <h2 className="flex items-center gap-2 text-xl font-bold"><Type className="h-6 w-6" aria-hidden="true" /> Tamanho da letra</h2>
