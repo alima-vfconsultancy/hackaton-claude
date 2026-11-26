@@ -41,7 +41,7 @@ export default function SettingsPage() {
       )}
 
       <section className="card mb-4">
-        <h2 className="flex items-center gap-2 text-xl font-bold"><Bell className="h-6 w-6" aria-hidden="true" /> Notificações</h2>
+        <h2 className="flex items-center gap-2 text-xl"><Bell className="h-6 w-6" aria-hidden="true" /> Notificações</h2>
         <p className="mt-1 text-base">
           Para avisar você na hora de tomar o remédio, o app precisa da sua permissão para mostrar avisos. Os avisos aparecem enquanto o app está aberto ou foi usado há pouco.
           Para lembretes garantidos com o app fechado, use "Adicionar lembretes ao calendário" dentro de cada remédio.
@@ -71,11 +71,11 @@ export default function SettingsPage() {
       </section>
 
       <section className="card mb-4">
-        <h2 className="flex items-center gap-2 text-xl font-bold"><Type className="h-6 w-6" aria-hidden="true" /> Tamanho da letra</h2>
+        <h2 className="flex items-center gap-2 text-xl"><Type className="h-6 w-6" aria-hidden="true" /> Tamanho da letra</h2>
         <div className="mt-3 grid grid-cols-2 gap-2" role="radiogroup" aria-label="Tamanho da letra">
           {FONT_SCALE_OPTIONS.map(([scale, label]) => (
             <button key={scale} type="button" role="radio" aria-checked={settings.fontScale === scale} onClick={() => app.settings.save({ fontScale: scale })}
-              className={`btn ${settings.fontScale === scale ? 'bg-brand-700 text-white' : 'border-2 border-slate-400 bg-white text-slate-900'}`}>
+              className={`btn ${settings.fontScale === scale ? 'bg-brand-700 text-white' : 'border-2 border-slate-400 bg-white text-ink'}`}>
               {label}
             </button>
           ))}
@@ -83,13 +83,13 @@ export default function SettingsPage() {
       </section>
 
       <section className="card mb-4">
-        <h2 className="flex items-center gap-2 text-xl font-bold"><Smartphone className="h-6 w-6" aria-hidden="true" /> Instalar na tela inicial</h2>
+        <h2 className="flex items-center gap-2 text-xl"><Smartphone className="h-6 w-6" aria-hidden="true" /> Instalar na tela inicial</h2>
         <details className="mt-2">
           <summary className="min-h-12 cursor-pointer py-2 text-base font-bold">Android (Chrome)</summary>
           <ol className="list-decimal space-y-1 pl-6 text-base">
             <li>Toque nos três pontinhos (⋮) no canto do Chrome.</li>
             <li>Toque em "Instalar app" ou "Adicionar à tela inicial".</li>
-            <li>Confirme. O ícone do MeuRemédio aparece na tela inicial.</li>
+            <li>Confirme. O ícone do Dose Certa aparece na tela inicial.</li>
           </ol>
         </details>
         <details className="mt-1">

@@ -18,6 +18,19 @@ describe('buildIcs', () => {
     expect(ics).toContain('SUMMARY:Tomar Amoxicilina (500 mg)');
   });
 
+  it('names the calendar and the reminder text after Dose Certa', () => {
+    const ics = buildIcs(base, now);
+    expect(ics).toContain('X-WR-CALNAME:Dose Certa');
+    expect(ics).toContain('Lembrete criado pelo Dose Certa.');
+    expect(ics).not.toContain('MeuRemédio');
+  });
+
+  it('keeps the internal PRODID and event UIDs, so re-imported reminders do not duplicate', () => {
+    const ics = buildIcs(base, now);
+    expect(ics).toContain('PRODID:-//MeuRemedio//PT-BR//');
+    expect(ics).toContain('UID:abc-0@meuremedio.app');
+  });
+
   it('uses FREQ=HOURLY when the interval does not divide 24h', () => {
     const ics = buildIcs({ ...base, schedule: { type: 'interval', intervalHours: 5, firstDoseTime: '08:00' } }, now);
     expect(ics.match(/BEGIN:VEVENT/g)).toHaveLength(1);

@@ -18,6 +18,18 @@ describe('buildPdfDocument', () => {
     expect(doc.getNumberOfPages()).toBeGreaterThanOrEqual(1);
   });
 
+  it('is titled with the Dose Certa brand', () => {
+    const raw = buildPdfDocument(request).output();
+    expect(raw).toContain('Dose Certa');
+    expect(raw).not.toMatch(/MeuRem/);
+  });
+
+  it('draws the monochrome brand symbol in graphite next to the title', () => {
+    const raw = buildPdfDocument(request).output();
+    // Graphite #1F2D30 (31, 45, 48) as an RGB fill, written by jsPDF with two decimals.
+    expect(raw).toContain('0.12 0.18 0.19 rg');
+  });
+
   it('adds a second page when the dose log does not fit after a long medication table', () => {
     const many = Array.from({ length: 40 }, (_, i) => buildMedication({ id: `m${i}`, name: `Medicamento ${i}` }));
     expect(buildPdfDocument({ ...request, medications: many }).getNumberOfPages()).toBeGreaterThan(1);

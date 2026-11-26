@@ -8,7 +8,7 @@ import { formatLocalDate } from '../../domain/time';
 import { Disclaimer } from '../components/Disclaimer';
 import { PageHeader } from '../components/PageHeader';
 
-const pdfFileName = (from: string, to: string) => `meu-remedio-${from}-a-${to}.pdf`;
+const pdfFileName = (from: string, to: string) => `dose-certa-${from}-a-${to}.pdf`;
 
 /** Generates the PDF history of the chosen period, to download or share. */
 export default function ExportPage() {
@@ -70,7 +70,7 @@ export default function ExportPage() {
       <p className="mb-4 text-base">Gere um PDF do seu histórico para imprimir ou mostrar ao médico.</p>
 
       <div className="card space-y-4">
-        <div className="grid grid-cols-2 gap-3">
+        <div className="grid gap-3">
           <div>
             <label htmlFor="pdf-from" className="field-label">De</label>
             <input id="pdf-from" type="date" className="field" value={from} max={to} onChange={(event) => setFrom(event.target.value)} />
@@ -92,7 +92,7 @@ export default function ExportPage() {
         </label>
       </div>
 
-      {message && <p role="status" className="mt-4 rounded-xl border-2 border-brand-700 bg-brand-50 p-3 font-semibold">{message}</p>}
+      {message && <p role="status" className="mt-4 rounded-xl border-2 border-brand-700 bg-mint p-3 font-semibold">{message}</p>}
 
       <div className="mt-4 space-y-3">
         <button type="button" disabled={isBusy} className="btn-primary w-full !min-h-14 text-lg" onClick={download}>

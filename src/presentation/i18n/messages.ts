@@ -39,8 +39,8 @@ export const ALLERGY_ISSUE_MESSAGES: Record<AllergyIssueCode, string> = {
 };
 
 export const BACKUP_ERROR_MESSAGES: Record<BackupErrorCode, string> = {
-  not_json: 'Este arquivo não é um backup válido. Escolha um arquivo .json exportado pelo MeuRemédio.',
-  not_a_backup: 'Este arquivo não é um backup do MeuRemédio. Escolha o arquivo que você exportou pelo app.',
+  not_json: 'Este arquivo não é um backup válido. Escolha um arquivo .json exportado pelo Dose Certa.',
+  not_a_backup: 'Este arquivo não é um backup do Dose Certa. Escolha o arquivo que você exportou pelo app.',
   unsupported_version: 'Este backup foi criado por uma versão incompatível do app. Exporte um novo backup no aparelho de origem.',
   incomplete: 'O backup está incompleto ou danificado. Tente exportar de novo no aparelho de origem.',
   invalid_data: 'O backup contém dados inválidos. Nada foi alterado.',
