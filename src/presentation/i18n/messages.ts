@@ -64,3 +64,9 @@ export const NOTIFICATION_PERMISSION_MESSAGES = {
   unsupported: 'Este navegador não permite avisos. Use "Adicionar lembretes ao calendário" em cada remédio.',
   default: 'Os avisos não foram ativados. Toque de novo e escolha "Permitir".',
 } as const;
+
+/** Shown on Hoje when a "Tomei"/"Adiar" tap on a notification could not be applied. */
+export const REMINDER_ACTION_MESSAGES = {
+  notOpen: 'Esta dose já tinha sido registrada ou passou do horário, por isso nada mudou. Confira a lista abaixo.',
+  failed: 'Não consegui registrar a dose pelo aviso. Toque em "Tomei" ou "Adiar" na lista abaixo.',
+} as const;

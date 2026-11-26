@@ -2,6 +2,7 @@ import { useEffect, useRef } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import type { ReminderAction } from '../../application/reminderService';
 import { app } from '../../composition-root';
+import { REMINDER_ACTION_MESSAGES } from '../i18n/messages';
 import { parseReminderLink, parseReminderMessage } from './reminderNotificationLinks';
 
 /**
@@ -15,8 +16,15 @@ export function useNotificationActions(): void {
 
   useEffect(() => {
     const apply = async (doseId: string, action: ReminderAction | null) => {
-      if (action) await app.reminders.handleNotificationAction(doseId, action);
-      navigate('/', { replace: true });
+      let notice: string | undefined;
+      try {
+        if (action && !(await app.reminders.handleNotificationAction(doseId, action))) notice = REMINDER_ACTION_MESSAGES.notOpen;
+      } catch {
+        notice = REMINDER_ACTION_MESSAGES.failed;
+      } finally {
+        // Always land on Hoje (and drop the reminder link), telling the user when nothing was registered.
+        navigate('/', { replace: true, state: notice ? { reminderNotice: notice } : null });
+      }
     };
 
     const link = parseReminderLink(search);

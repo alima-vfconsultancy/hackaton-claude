@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { BellRing } from 'lucide-react';
+import { BellOff, BellRing } from 'lucide-react';
 import { useNotificationSettings } from '../hooks/useNotificationSettings';
 import { NOTIFICATION_PERMISSION_MESSAGES } from '../i18n/messages';
 
@@ -29,7 +29,12 @@ export function EnableRemindersCard() {
       <button type="button" className="btn-primary mt-3 w-full" onClick={enable}>
         Ativar avisos
       </button>
-      {error && <p role="alert" className="mt-2 text-base font-semibold text-red-900">{error}</p>}
+      {error && (
+        <p role="alert" className="mt-2 flex items-start gap-2 text-base font-semibold text-red-900">
+          <BellOff className="mt-0.5 h-5 w-5 shrink-0" aria-hidden="true" />
+          <span>{error}</span>
+        </p>
+      )}
     </section>
   );
 }
