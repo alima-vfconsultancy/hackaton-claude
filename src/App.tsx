@@ -3,6 +3,7 @@ import { Route, Routes, useLocation } from 'react-router-dom';
 import { BottomNav } from './presentation/components/BottomNav';
 import { DueBanner } from './presentation/components/DueBanner';
 import { PageHeader } from './presentation/components/PageHeader';
+import { useNotificationActions } from './presentation/hooks/useNotificationActions';
 import { useReminders } from './presentation/hooks/useReminders';
 import { useSettings } from './presentation/hooks/useSettings';
 import AllergiesPage from './presentation/pages/AllergiesPage';
@@ -23,6 +24,7 @@ export default function App() {
   const settings = useSettings();
   const { pathname } = useLocation();
   const due = useReminders(settings.notificationsEnabled);
+  useNotificationActions();
 
   useEffect(() => {
     document.documentElement.classList.toggle('font-large', settings.fontScale === 'large');

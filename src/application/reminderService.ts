@@ -1,10 +1,14 @@
 import { effectiveTime, MISSED_AFTER_MS } from '../domain/dose';
-import type { DoseEntry } from './doseService';
+import { DEFAULT_SETTINGS } from '../domain/settings';
+import type { DoseEntry, DoseService } from './doseService';
 import type { ReminderNotifier, StoragePorts } from './ports';
 import type { SyncDoses } from './syncDoses';
 
 /** A dose that is due now (its time has come and it is not yet overdue). */
 export type DueDose = DoseEntry;
+
+/** Buttons on the reminder notification: "Tomei" and "Adiar". */
+export type ReminderAction = 'take' | 'snooze';
 
 export interface ReminderService {
   /**
@@ -12,11 +16,24 @@ export interface ReminderService {
    * (beep + system notification when notifications are enabled).
    */
   check(options: { notificationsEnabled: boolean }): Promise<DueDose[]>;
+  /**
+   * Applies the button the user tapped on a dose notification: "take" marks it as taken,
+   * "snooze" postpones it by the minutes in the settings. Only doses still waiting
+   * (pending or snoozed, not yet missed) change.
+   *
+   * @returns whether the dose was changed
+   */
+  handleNotificationAction(doseId: string, action: ReminderAction): Promise<boolean>;
 }
 
-/** Builds the reminder check, which alerts through the given notifier. */
-export function createReminderService(ports: StoragePorts, notifier: ReminderNotifier, syncDoses: SyncDoses): ReminderService {
-  const { medications, doses } = ports;
+/** Builds the reminder use cases, which alert through the given notifier and register doses through `doseService`. */
+export function createReminderService(
+  ports: StoragePorts,
+  notifier: ReminderNotifier,
+  syncDoses: SyncDoses,
+  doseService: DoseService,
+): ReminderService {
+  const { medications, doses, settings } = ports;
 
   return {
     async check({ notificationsEnabled }) {
@@ -40,6 +57,20 @@ export function createReminderService(ports: StoragePorts, notifier: ReminderNot
         await doses.update(dose.id, { notifiedAt: now });
       }
       return due;
+    },
+
+    async handleNotificationAction(doseId, action) {
+      // Sync first, so a dose that became "missed" while the app was closed is not registered late.
+      await syncDoses();
+      const dose = (await doses.listOpen()).find((open) => open.id === doseId);
+      if (!dose) return false;
+      if (action === 'take') {
+        await doseService.mark(doseId, 'taken');
+      } else {
+        const { snoozeMinutes } = (await settings.get()) ?? DEFAULT_SETTINGS;
+        await doseService.snooze(doseId, snoozeMinutes);
+      }
+      return true;
     },
   };
 }

@@ -2,7 +2,7 @@ import { endOfDay, startOfDay } from 'date-fns';
 import { effectiveTime, type DoseLog } from '../domain/dose';
 import type { Medication } from '../domain/medication';
 import { MINUTE_MS } from '../domain/time';
-import type { StoragePorts } from './ports';
+import type { ReminderNotifier, StoragePorts } from './ports';
 import type { SyncDoses } from './syncDoses';
 
 export interface DoseEntry {
@@ -25,8 +25,11 @@ export interface DoseService {
   undo(id: string): Promise<void>;
 }
 
-/** Builds the use cases that read and change the dose log; `syncDoses` keeps doses consistent after an undo. */
-export function createDoseService(ports: StoragePorts, syncDoses: SyncDoses): DoseService {
+/**
+ * Builds the use cases that read and change the dose log; `syncDoses` keeps doses consistent after an undo
+ * and `notifier` closes the reminder of a dose once it is registered.
+ */
+export function createDoseService(ports: StoragePorts, syncDoses: SyncDoses, notifier: ReminderNotifier): DoseService {
   const { medications, doses } = ports;
 
   return {
@@ -43,11 +46,15 @@ export function createDoseService(ports: StoragePorts, syncDoses: SyncDoses): Do
       return { entries, activeMedicationCount: allMedications.filter((m) => m.status === 'active').length };
     },
 
-    mark: (id, status) =>
-      doses.update(id, { status, takenAt: status === 'taken' ? Date.now() : undefined, snoozedUntil: undefined }),
+    async mark(id, status) {
+      await doses.update(id, { status, takenAt: status === 'taken' ? Date.now() : undefined, snoozedUntil: undefined });
+      await notifier.dismissDoseReminder(id);
+    },
 
-    snooze: (id, minutes) =>
-      doses.update(id, { status: 'snoozed', snoozedUntil: Date.now() + minutes * MINUTE_MS, notifiedAt: undefined }),
+    async snooze(id, minutes) {
+      await doses.update(id, { status: 'snoozed', snoozedUntil: Date.now() + minutes * MINUTE_MS, notifiedAt: undefined });
+      await notifier.dismissDoseReminder(id);
+    },
 
     async undo(id) {
       await doses.update(id, { status: 'pending', takenAt: undefined, snoozedUntil: undefined, notifiedAt: undefined });

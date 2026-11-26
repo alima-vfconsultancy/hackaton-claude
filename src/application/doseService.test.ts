@@ -1,5 +1,5 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
-import { buildDose, buildMedication, createInMemoryPorts } from './testing/inMemoryPorts';
+import { buildDose, buildMedication, createInMemoryPorts, createRecordingNotifier } from './testing/inMemoryPorts';
 import { createDoseService } from './doseService';
 import { createSyncDoses } from './syncDoses';
 
@@ -14,7 +14,8 @@ afterEach(() => vi.useRealTimers());
 
 const setup = (initial = {}) => {
   const ports = createInMemoryPorts(initial);
-  return { ports, service: createDoseService(ports, createSyncDoses(ports)) };
+  const notifier = createRecordingNotifier();
+  return { ports, notifier, service: createDoseService(ports, createSyncDoses(ports), notifier) };
 };
 
 describe('getToday', () => {
@@ -65,5 +66,17 @@ describe('mark, snooze and undo', () => {
 
     expect(ports.store.doses[0]).toMatchObject({ status: 'pending' });
     expect(ports.store.doses[0]).not.toHaveProperty('takenAt');
+  });
+});
+
+describe('reminder notification', () => {
+  it('closes the notification of a dose once it is taken, skipped or snoozed', async () => {
+    const { notifier, service } = setup({ doses: [buildDose({ id: 'a' }), buildDose({ id: 'b' }), buildDose({ id: 'c' })] });
+
+    await service.mark('a', 'taken');
+    await service.mark('b', 'skipped');
+    await service.snooze('c', 10);
+
+    expect(notifier.dismissed).toEqual(['a', 'b', 'c']);
   });
 });

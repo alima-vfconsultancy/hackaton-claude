@@ -22,6 +22,16 @@ export const createBrowserReminderNotifier = (): ReminderNotifier => ({
       await registration.showNotification(`Hora de tomar ${medication.name}`, {
         body: [formatDosage(medication.dosage), medication.instructions].filter(Boolean).join(' · ') || 'Abra o app para registrar a dose.',
         tag: dose.id,
+        // Read by public/sw-notifications.js to know which dose the buttons refer to.
+        data: { doseId: dose.id },
+        // Buttons are ignored where unsupported (iPhone): tapping the notification still opens Hoje.
+        actions: [
+          { action: 'take', title: 'Tomei' },
+          { action: 'snooze', title: 'Adiar' },
+        ],
+        // Stays on screen until the user acts, and alerts again when a snoozed dose comes back.
+        requireInteraction: true,
+        renotify: true,
         icon: '/icons/icon-192.png',
         badge: '/icons/icon-192.png',
         vibrate: [200, 100, 200, 100, 200],
@@ -30,6 +40,17 @@ export const createBrowserReminderNotifier = (): ReminderNotifier => ({
       return true;
     } catch {
       return false;
+    }
+  },
+
+  async dismissDoseReminder(doseId) {
+    if (!isSupported()) return;
+    try {
+      const registration = await navigator.serviceWorker.getRegistration();
+      const open = (await registration?.getNotifications({ tag: doseId })) ?? [];
+      for (const notification of open) notification.close();
+    } catch {
+      /* nothing to close */
     }
   },
 

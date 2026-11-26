@@ -138,6 +138,8 @@ export interface ReminderNotifier {
   requestPermission(): Promise<NotificationPermissionState>;
   /** Returns whether a notification was actually shown. */
   showDoseReminder(dose: DoseLog, medication: Medication): Promise<boolean>;
+  /** Closes the notification of a dose that was already registered; fails silently. */
+  dismissDoseReminder(doseId: string): Promise<void>;
   /** Short beep and vibration while the app is open; fails silently. */
   playAlert(): void;
 }
