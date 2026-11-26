@@ -25,7 +25,7 @@ const DOSING_WORDS = [
   'aplicar', 'refeição', 'refeições', 'almoço', 'jantar', 'noite', 'manhã', 'mililitros', 'colher',
 ];
 
-const stripAccents = (text: string) => text.normalize('NFD').replace(/[̀-ͯ]/g, '');
+const stripAccents = (text: string) => text.normalize('NFD').replace(/[\u0300-\u036f]/g, '');
 
 /** Spelling key that ignores the usual OCR confusions: "rn"/"m", "i"/"l"/"1", "vv"/"w". */
 const lookalikeKey = (word: string) =>
