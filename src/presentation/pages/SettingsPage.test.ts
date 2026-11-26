@@ -29,7 +29,23 @@ describe('SettingsPage', () => {
     'Adiar por quantos minutos?',
     'Tamanho da letra',
     'Instalar na tela inicial',
+    'Exportar PDF',
   ])('keeps the "%s" section', (text) => {
     expect(source).toContain(text);
+  });
+
+  it('no longer hosts the allergy registry (it has its own tab)', () => {
+    expect(source).not.toContain('AllergySection');
+  });
+
+  it('links to the PDF export screen', () => {
+    expect(source).toContain('to="/exportar"');
+  });
+});
+
+describe('ExportPage', () => {
+  it('goes back to Ajustes, where it is now opened from', () => {
+    const exportSource = readFileSync(resolve(__dirname, 'ExportPage.tsx'), 'utf-8');
+    expect(exportSource).toContain('back="/configuracoes"');
   });
 });
