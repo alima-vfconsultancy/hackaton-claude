@@ -40,62 +40,64 @@ export default function SettingsPage() {
         </p>
       )}
 
-      <section className="card mb-4">
-        <h2 className="flex items-center gap-2 text-xl"><Bell className="h-6 w-6" aria-hidden="true" /> Notificações</h2>
-        <p className="mt-1 text-base">
-          Para avisar você na hora de tomar o remédio, o app precisa da sua permissão para mostrar avisos. Os avisos aparecem enquanto o app está aberto ou foi usado há pouco.
-          Para lembretes garantidos com o app fechado, use "Adicionar lembretes ao calendário" dentro de cada remédio.
-        </p>
-        {!app.notifier.isSupported() && <p className="mt-2 text-base font-semibold">Este navegador não oferece notificações.</p>}
-        <button type="button" role="switch" aria-checked={settings.notificationsEnabled}
-          className={settings.notificationsEnabled ? 'btn-ghost mt-3 w-full' : 'btn-primary mt-3 w-full'}
-          onClick={toggleNotifications} disabled={!app.notifier.isSupported()}>
-          {settings.notificationsEnabled ? 'Desativar notificações' : 'Ativar notificações'}
-        </button>
-        {permission === 'denied' && <p className="mt-2 text-sm font-semibold text-red-900">As notificações estão bloqueadas no navegador.</p>}
-        <div className="mt-4">
-          <label htmlFor="snooze-minutes" className="field-label">Adiar por quantos minutos?</label>
-          <select id="snooze-minutes" className="field" value={settings.snoozeMinutes}
-            onChange={(event) => app.settings.save({ snoozeMinutes: Number(event.target.value) })}>
-            {SNOOZE_OPTIONS_MINUTES.map((minutes) => <option key={minutes} value={minutes}>{minutes} minutos</option>)}
-          </select>
-        </div>
-      </section>
-
-      <AllergySection />
-
-      <section className="card mb-4">
-        <h2 className="flex items-center gap-2 text-xl"><Type className="h-6 w-6" aria-hidden="true" /> Tamanho da letra</h2>
-        <div className="mt-3 grid grid-cols-2 gap-2" role="radiogroup" aria-label="Tamanho da letra">
-          {FONT_SCALE_OPTIONS.map(([scale, label]) => (
-            <button key={scale} type="button" role="radio" aria-checked={settings.fontScale === scale} onClick={() => app.settings.save({ fontScale: scale })}
-              className={`btn ${settings.fontScale === scale ? 'bg-brand-700 text-white' : 'border-2 border-slate-400 bg-white text-ink'}`}>
-              {label}
-            </button>
-          ))}
-        </div>
-      </section>
-
-      <section className="card mb-4">
-        <h2 className="flex items-center gap-2 text-xl"><Smartphone className="h-6 w-6" aria-hidden="true" /> Instalar na tela inicial</h2>
-        <details className="mt-2">
-          <summary className="min-h-12 cursor-pointer py-2 text-base font-bold">Android (Chrome)</summary>
-          <ol className="list-decimal space-y-1 pl-6 text-base">
-            <li>Toque nos três pontinhos (⋮) no canto do Chrome.</li>
-            <li>Toque em "Instalar app" ou "Adicionar à tela inicial".</li>
-            <li>Confirme. O ícone do Dose Certa aparece na tela inicial.</li>
-          </ol>
-        </details>
-        <details className="mt-1">
-          <summary className="min-h-12 cursor-pointer py-2 text-base font-bold">iPhone (Safari)</summary>
-          <ol className="list-decimal space-y-1 pl-6 text-base">
-            <li>Abra este endereço no Safari (não funciona em outros navegadores).</li>
-            <li>Toque no botão Compartilhar (quadrado com seta para cima).</li>
-            <li>Escolha "Adicionar à Tela de Início".</li>
-            <li>Toque em "Adicionar".</li>
-          </ol>
-        </details>
-      </section>
+      <div className="xl:grid xl:grid-cols-2 xl:items-start xl:gap-x-4">
+        <section className="card mb-4">
+          <h2 className="flex items-center gap-2 text-xl"><Bell className="h-6 w-6" aria-hidden="true" /> Notificações</h2>
+          <p className="mt-1 text-base">
+            Para avisar você na hora de tomar o remédio, o app precisa da sua permissão para mostrar avisos. Os avisos aparecem enquanto o app está aberto ou foi usado há pouco.
+            Para lembretes garantidos com o app fechado, use "Adicionar lembretes ao calendário" dentro de cada remédio.
+          </p>
+          {!app.notifier.isSupported() && <p className="mt-2 text-base font-semibold">Este navegador não oferece notificações.</p>}
+          <button type="button" role="switch" aria-checked={settings.notificationsEnabled}
+            className={settings.notificationsEnabled ? 'btn-ghost mt-3 w-full' : 'btn-primary mt-3 w-full'}
+            onClick={toggleNotifications} disabled={!app.notifier.isSupported()}>
+            {settings.notificationsEnabled ? 'Desativar notificações' : 'Ativar notificações'}
+          </button>
+          {permission === 'denied' && <p className="mt-2 text-sm font-semibold text-red-900">As notificações estão bloqueadas no navegador.</p>}
+          <div className="mt-4">
+            <label htmlFor="snooze-minutes" className="field-label">Adiar por quantos minutos?</label>
+            <select id="snooze-minutes" className="field" value={settings.snoozeMinutes}
+              onChange={(event) => app.settings.save({ snoozeMinutes: Number(event.target.value) })}>
+              {SNOOZE_OPTIONS_MINUTES.map((minutes) => <option key={minutes} value={minutes}>{minutes} minutos</option>)}
+            </select>
+          </div>
+        </section>
+  
+        <AllergySection />
+  
+        <section className="card mb-4">
+          <h2 className="flex items-center gap-2 text-xl"><Type className="h-6 w-6" aria-hidden="true" /> Tamanho da letra</h2>
+          <div className="mt-3 grid grid-cols-2 gap-2" role="radiogroup" aria-label="Tamanho da letra">
+            {FONT_SCALE_OPTIONS.map(([scale, label]) => (
+              <button key={scale} type="button" role="radio" aria-checked={settings.fontScale === scale} onClick={() => app.settings.save({ fontScale: scale })}
+                className={`btn ${settings.fontScale === scale ? 'bg-brand-700 text-white' : 'border-2 border-slate-400 bg-white text-ink'}`}>
+                {label}
+              </button>
+            ))}
+          </div>
+        </section>
+  
+        <section className="card mb-4">
+          <h2 className="flex items-center gap-2 text-xl"><Smartphone className="h-6 w-6" aria-hidden="true" /> Instalar na tela inicial</h2>
+          <details className="mt-2">
+            <summary className="min-h-12 cursor-pointer py-2 text-base font-bold">Android (Chrome)</summary>
+            <ol className="list-decimal space-y-1 pl-6 text-base">
+              <li>Toque nos três pontinhos (⋮) no canto do Chrome.</li>
+              <li>Toque em "Instalar app" ou "Adicionar à tela inicial".</li>
+              <li>Confirme. O ícone do Dose Certa aparece na tela inicial.</li>
+            </ol>
+          </details>
+          <details className="mt-1">
+            <summary className="min-h-12 cursor-pointer py-2 text-base font-bold">iPhone (Safari)</summary>
+            <ol className="list-decimal space-y-1 pl-6 text-base">
+              <li>Abra este endereço no Safari (não funciona em outros navegadores).</li>
+              <li>Toque no botão Compartilhar (quadrado com seta para cima).</li>
+              <li>Escolha "Adicionar à Tela de Início".</li>
+              <li>Toque em "Adicionar".</li>
+            </ol>
+          </details>
+        </section>
+      </div>
     </div>
   );
 }

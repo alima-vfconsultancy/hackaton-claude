@@ -40,26 +40,28 @@ export default function HistoryPage() {
       </div>
 
       <div className="card mb-4 space-y-3">
-        <div>
-          <label htmlFor="history-search" className="field-label">Buscar pelo nome</label>
-          <div className="relative">
-            <Search className="pointer-events-none absolute left-3 top-1/2 h-5 w-5 -translate-y-1/2 text-muted" aria-hidden="true" />
-            <input id="history-search" type="search" className="field !pl-10" value={search}
-              onChange={(event) => setSearch(event.target.value)} placeholder="Ex.: Amoxicilina" />
-          </div>
-        </div>
-        <div className="grid gap-3">
+        <div className="space-y-3 xl:grid xl:grid-cols-[minmax(0,1fr)_22rem] xl:items-end xl:gap-3 xl:space-y-0">
           <div>
-            <label htmlFor="history-from" className="field-label">De</label>
-            <input id="history-from" type="date" className="field" value={from} onChange={(event) => setFrom(event.target.value)} />
+            <label htmlFor="history-search" className="field-label">Buscar pelo nome</label>
+            <div className="relative">
+              <Search className="pointer-events-none absolute left-3 top-1/2 h-5 w-5 -translate-y-1/2 text-muted" aria-hidden="true" />
+              <input id="history-search" type="search" className="field !pl-10" value={search}
+                onChange={(event) => setSearch(event.target.value)} placeholder="Ex.: Amoxicilina" />
+            </div>
           </div>
-          <div>
-            <label htmlFor="history-to" className="field-label">Até</label>
-            <input id="history-to" type="date" className="field" value={to} onChange={(event) => setTo(event.target.value)} />
+          <div className="grid gap-3 md:grid-cols-2">
+            <div>
+              <label htmlFor="history-from" className="field-label">De</label>
+              <input id="history-from" type="date" className="field" value={from} onChange={(event) => setFrom(event.target.value)} />
+            </div>
+            <div>
+              <label htmlFor="history-to" className="field-label">Até</label>
+              <input id="history-to" type="date" className="field" value={to} onChange={(event) => setTo(event.target.value)} />
+            </div>
           </div>
         </div>
         {(from || to || search) && (
-          <button type="button" className="btn-ghost w-full" onClick={() => { setFrom(''); setTo(''); setSearch(''); }}>Limpar filtros</button>
+          <button type="button" className="btn-ghost w-full md:w-auto" onClick={() => { setFrom(''); setTo(''); setSearch(''); }}>Limpar filtros</button>
         )}
       </div>
 
@@ -70,7 +72,7 @@ export default function HistoryPage() {
             : 'Nenhum remédio encontrado com esses filtros.'}
         </p>
       ) : (
-        <ul className="space-y-3">
+        <ul className="grid gap-3 md:grid-cols-2">
           {visible.map((medication) => (
             <li key={medication.id}>
               <Link to={`/historico/${medication.id}`} className="card flex items-center gap-3 hover:bg-mist">
