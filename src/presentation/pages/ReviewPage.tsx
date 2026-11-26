@@ -4,9 +4,12 @@ import { AlertCircle, CheckCheck, Plus, Trash2 } from 'lucide-react';
 import { parsePrescription, suggestionToDraft } from '../../application/prescriptionParser';
 import { app } from '../../composition-root';
 import { formatLocalDate } from '../../domain/time';
+import { AiAllergyCheck } from '../components/AiAllergyCheck';
+import { AllergyWarning } from '../components/AllergyWarning';
 import { Disclaimer } from '../components/Disclaimer';
 import { MedicationForm, type FieldFlags } from '../components/MedicationForm';
 import { PageHeader } from '../components/PageHeader';
+import { useLiveData } from '../hooks/useLiveData';
 import { buildMedicationDraft, createEmptyFormValues, medicationToFormValues, type MedicationFormValues } from '../forms/medicationFormValues';
 import {
   ALL_REQUIRED_FIELDS, clearUnreadValues, detectUnreadFields, findEmptyRequiredFields, type RequiredFieldFlags,
@@ -73,6 +76,7 @@ export default function ReviewPage() {
   const [errors, setErrors] = useState<string[]>([]);
   const [isSaving, setIsSaving] = useState(false);
   const [isSubmitted, setIsSubmitted] = useState(false);
+  const allergies = useLiveData(() => app.allergies.list());
 
   if (!state) return <Navigate to="/fotografar" replace />;
 
@@ -148,10 +152,15 @@ export default function ReviewPage() {
                 <Trash2 className="h-5 w-5" aria-hidden="true" /> Remover
               </button>
             </div>
+            <AllergyWarning medicationName={item.values.name} allergies={allergies ?? []} />
             <MedicationForm value={item.values} flags={item.flags} unread={item.unread} isSubmitted={isSubmitted}
               onChange={(values) => setItems((list) => list.map((other) => (other.key === item.key ? { ...other, values } : other)))} />
           </section>
         ))}
+      </div>
+
+      <div className="mt-4">
+        <AiAllergyCheck medicationNames={items.map((item) => item.values.name)} />
       </div>
 
       <button type="button" className="btn-secondary mt-4 w-full" onClick={addItem}>

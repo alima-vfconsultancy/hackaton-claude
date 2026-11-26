@@ -1,3 +1,4 @@
+import type { Allergy } from '../domain/allergy';
 import type { DoseLog } from '../domain/dose';
 import type { Medication } from '../domain/medication';
 import type { PrescriptionPhoto } from '../domain/photo';
@@ -17,6 +18,8 @@ export interface BackupFile {
   medications: Medication[];
   doseLogs: DoseLog[];
   photos: PrescriptionPhoto[];
+  /** Empty for backups made before allergies existed. */
+  allergies: Allergy[];
   settings: Settings | null;
 }
 
@@ -41,6 +44,9 @@ const isDoseShape = (value: unknown): boolean =>
   isObject(value) && typeof value.id === 'string' && typeof value.medicationId === 'string' && typeof value.scheduledAt === 'number'
   && DOSE_STATUSES.includes(value.status as string);
 
+const isAllergyShape = (value: unknown): boolean =>
+  isObject(value) && typeof value.id === 'string' && typeof value.substance === 'string' && typeof value.createdAt === 'number';
+
 const isSettingsShape = (value: unknown): boolean =>
   isObject(value) && typeof value.notificationsEnabled === 'boolean' && typeof value.snoozeMinutes === 'number'
   && (value.fontScale === 'normal' || value.fontScale === 'large');
@@ -61,6 +67,7 @@ export function parseBackup(text: string): BackupFile {
   if (data.version !== BACKUP_VERSION) throw new BackupError('unsupported_version');
   if (!Array.isArray(data.medications) || !Array.isArray(data.doseLogs)) throw new BackupError('incomplete');
   if (!data.medications.every(isMedicationShape) || !data.doseLogs.every(isDoseShape)) throw new BackupError('invalid_data');
+  if (data.allergies !== undefined && !(Array.isArray(data.allergies) && data.allergies.every(isAllergyShape))) throw new BackupError('invalid_data');
   if (data.settings != null && !isSettingsShape(data.settings)) throw new BackupError('invalid_data');
 
   return {
@@ -70,7 +77,9 @@ export function parseBackup(text: string): BackupFile {
     medications: data.medications as Medication[],
     doseLogs: data.doseLogs as DoseLog[],
     photos: Array.isArray(data.photos) ? (data.photos as PrescriptionPhoto[]) : [],
-    settings: data.settings ? (data.settings as Settings) : null,
+    allergies: Array.isArray(data.allergies) ? (data.allergies as Allergy[]) : [],
+    // Backups from before the AI consent existed (or edited by hand) never grant it.
+    settings: data.settings ? { ...(data.settings as Settings), allergyAiConsent: (data.settings as Settings).allergyAiConsent === true } : null,
   };
 }
 
@@ -84,14 +93,14 @@ export interface BackupService {
 
 /** Builds the backup/restore/wipe use cases on top of the storage ports. */
 export function createBackupService(ports: StoragePorts): BackupService {
-  const { transactions, medications, doses, photos, settings } = ports;
+  const { transactions, medications, doses, photos, allergies, settings } = ports;
 
-  const clearAll = () => Promise.all([medications.clear(), doses.clear(), photos.clear(), settings.clear()]);
+  const clearAll = () => Promise.all([medications.clear(), doses.clear(), photos.clear(), allergies.clear(), settings.clear()]);
 
   return {
     async build() {
-      const [allMedications, allDoses, allPhotos, storedSettings] = await Promise.all([
-        medications.list(), doses.listAll(), photos.listAll(), settings.get(),
+      const [allMedications, allDoses, allPhotos, allAllergies, storedSettings] = await Promise.all([
+        medications.list(), doses.listAll(), photos.listAll(), allergies.listAll(), settings.get(),
       ]);
       return {
         app: BACKUP_APP_ID,
@@ -100,6 +109,7 @@ export function createBackupService(ports: StoragePorts): BackupService {
         medications: allMedications,
         doseLogs: allDoses,
         photos: allPhotos,
+        allergies: allAllergies,
         settings: storedSettings ?? null,
       };
     },
@@ -110,6 +120,7 @@ export function createBackupService(ports: StoragePorts): BackupService {
         await medications.addMany(backup.medications);
         await doses.addMany(backup.doseLogs);
         if (backup.photos.length) await photos.addMany(backup.photos);
+        if (backup.allergies.length) await allergies.addMany(backup.allergies);
         if (backup.settings) await settings.save(backup.settings);
       }),
 

@@ -5,6 +5,7 @@ import { DueBanner } from './presentation/components/DueBanner';
 import { PageHeader } from './presentation/components/PageHeader';
 import { useReminders } from './presentation/hooks/useReminders';
 import { useSettings } from './presentation/hooks/useSettings';
+import CalendarPage from './presentation/pages/CalendarPage';
 import CapturePage from './presentation/pages/CapturePage';
 import ExportPage from './presentation/pages/ExportPage';
 import HistoryPage from './presentation/pages/HistoryPage';
@@ -39,6 +40,7 @@ export default function App() {
       <main id="content">
         <Routes>
           <Route path="/" element={<TodayPage />} />
+          <Route path="/calendario" element={<CalendarPage />} />
           <Route path="/fotografar" element={<CapturePage />} />
           <Route path="/revisar" element={<ReviewPage />} />
           <Route path="/medicamento/novo" element={<MedicationEditPage />} />

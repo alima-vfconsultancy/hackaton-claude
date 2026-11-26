@@ -1,4 +1,5 @@
 import Dexie, { type Table } from 'dexie';
+import type { Allergy } from '../../../domain/allergy';
 import type { DoseLog } from '../../../domain/dose';
 import type { Medication } from '../../../domain/medication';
 import type { PrescriptionPhoto } from '../../../domain/photo';
@@ -17,6 +18,7 @@ export class AppDatabase extends Dexie {
   doseLogs!: Table<DoseLog, string>;
   settings!: Table<SettingsRow, string>;
   photos!: Table<PrescriptionPhoto, string>;
+  allergies!: Table<Allergy, string>;
 
   constructor(name = 'meu-remedio') {
     super(name);
@@ -37,5 +39,13 @@ export class AppDatabase extends Dexie {
         photos: 'id',
       })
       .upgrade((transaction) => Promise.all(TABLE_NAMES.map((table) => transaction.table(table).clear())).then(() => undefined));
+    // Version 3: adds the allergies table; existing data is kept.
+    this.version(3).stores({
+      medications: 'id, status, name, period.startDate, photoId',
+      doseLogs: 'id, medicationId, scheduledAt, status, &[medicationId+scheduledAt]',
+      settings: 'key',
+      photos: 'id',
+      allergies: 'id',
+    });
   }
 }

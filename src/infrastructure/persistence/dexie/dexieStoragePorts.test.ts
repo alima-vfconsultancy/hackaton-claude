@@ -81,9 +81,22 @@ describe('settings', () => {
     const { ports } = setup();
     expect(await ports.settings.get()).toBeUndefined();
 
-    await ports.settings.save({ notificationsEnabled: true, snoozeMinutes: 15, fontScale: 'large' });
+    await ports.settings.save({ notificationsEnabled: true, snoozeMinutes: 15, fontScale: 'large', allergyAiConsent: false });
 
-    expect(await ports.settings.get()).toEqual({ notificationsEnabled: true, snoozeMinutes: 15, fontScale: 'large' });
+    expect(await ports.settings.get()).toEqual({ notificationsEnabled: true, snoozeMinutes: 15, fontScale: 'large', allergyAiConsent: false });
+  });
+});
+
+describe('allergies', () => {
+  it('stores, lists and removes allergies', async () => {
+    const { ports } = setup();
+    await ports.allergies.add({ id: 'a1', substance: 'Dipirona', notes: '', createdAt: 1 });
+    await ports.allergies.addMany([{ id: 'a2', substance: 'Penicilina', notes: 'rash', createdAt: 2 }]);
+
+    expect((await ports.allergies.listAll()).map((a) => a.id).sort()).toEqual(['a1', 'a2']);
+
+    await ports.allergies.remove('a1');
+    expect((await ports.allergies.listAll()).map((a) => a.id)).toEqual(['a2']);
   });
 });
 
